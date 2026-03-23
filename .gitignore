@@ -1,0 +1,50 @@
+# ── Secrets & environment ──────────────────────────────────────────────────
+.env
+.env.*
+*.env
+!.env.example
+secrets.json
+credentials.json
+
+# ── Claude Code internals ──────────────────────────────────────────────────
+.claude/
+
+# ── Large generated artefacts (re-creatable, not source) ──────────────────
+graphs/
+snapshots/
+models/
+training_index.json
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# ── Home-directory sensitive files (repo root is $HOME) ───────────────────
+# NEVER commit these — SSH keys, shell configs may contain exported secrets
+.ssh/
+.gnupg/
+.claude.json
+.bashrc
+.bash_logout
+.bash_history
+.profile
+.config/
+.cache/
+.local/
+.npm/
+.sudo_as_admin_successful
+snap/
+
+# ── OS / editor noise ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/

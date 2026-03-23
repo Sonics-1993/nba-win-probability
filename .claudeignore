@@ -1,0 +1,17 @@
+# Files Claude should never read, summarise, or include in context
+
+# ── Secrets & environment ──────────────────────────────────────────────────
+.env
+.env.*
+*.env
+secrets.json
+credentials.json
+
+# ── Claude Code internals ──────────────────────────────────────────────────
+.claude/
+
+# ── Large binary / generated output (not useful for code assistance) ───────
+graphs/
+snapshots/
+models/
+training_index.json
