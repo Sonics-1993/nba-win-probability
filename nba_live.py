@@ -14,8 +14,11 @@ A visible ALERT fires whenever comeback probability ≥ 65 %.
 import os, sys, re, math, time, json, pickle, warnings, textwrap
 import numpy as np
 import requests
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 from collections import defaultdict
+
+ET = ZoneInfo("America/New_York")
 
 warnings.filterwarnings("ignore")
 
@@ -192,15 +195,17 @@ def compute_game_features(series, max_period, current_period):
         if raw:
             record["quarters"][q_label] = {"raw": raw, "cv": None}
 
-    # Decide which model to use based on how many complete quarters exist
+    # Use Q1 model once 12 minutes (720 s) of data are available,
+    # regardless of whether Q2 has officially started.
+    max_elapsed = max(series.keys()) if series else 0
     if current_period >= 4:
         model_q = "Q3"
     elif current_period >= 3:
         model_q = "Q2"
-    elif current_period >= 2:
+    elif current_period >= 2 or max_elapsed >= 720:
         model_q = "Q1"
     else:
-        model_q = None   # Q1 not complete yet
+        model_q = None   # less than 12 min played
 
     return record, model_q
 
@@ -442,6 +447,53 @@ def render(states, next_refresh_secs, fetch_ts):
     sys.stdout.flush()
 
 
+# ── time-window helpers ───────────────────────────────────────────────────────
+WINDOW_START_H, WINDOW_START_M = 19,  0   # 7:00 PM ET
+WINDOW_END_H,   WINDOW_END_M   =  1, 30   # 1:30 AM ET (next calendar day)
+
+def _tonight_window():
+    """Return (window_start, window_end) as timezone-aware ET datetimes."""
+    now_et    = datetime.now(ET)
+    today_et  = now_et.date()
+    tomorrow  = today_et + timedelta(days=1)
+    start = datetime(today_et.year,  today_et.month,  today_et.day,
+                     WINDOW_START_H, WINDOW_START_M, 0, tzinfo=ET)
+    end   = datetime(tomorrow.year,  tomorrow.month,  tomorrow.day,
+                     WINDOW_END_H,   WINDOW_END_M,   0, tzinfo=ET)
+    return start, end
+
+def wait_for_tipoff(window_start, games):
+    """Block until window_start, showing a live countdown."""
+    W = 82
+    while True:
+        now = datetime.now(ET)
+        if now >= window_start:
+            break
+        secs_left = int((window_start - now).total_seconds())
+        hrs, rem  = divmod(secs_left, 3600)
+        mins, sec = divmod(rem, 60)
+        clear_screen()
+        date_str = now.strftime("%a %b %d %Y")
+        print(clr("═" * W, CYAN))
+        print(clr(f"  🏀  NBA LIVE DASHBOARD  ·  {date_str}", BOLD + CYAN))
+        print(clr("═" * W, CYAN))
+        print()
+        print(clr("  ⏳  Waiting for tip-off…  First games at 7:00 PM ET", BOLD))
+        print()
+        print(f"  Countdown:  {clr(f'{hrs}h {mins:02d}m {sec:02d}s', YELLOW + BOLD)}")
+        print()
+        if games:
+            print(f"  Tonight's slate ({len(games)} game(s)):")
+            for g in games:
+                tip = g.get("tip_off", "")
+                print(f"    {g['away_tri']} @ {g['home_tri']}"
+                      + (f"  —  {tip}" if tip else ""))
+        print()
+        print(clr("═" * W, CYAN))
+        sys.stdout.flush()
+        time.sleep(1)
+
+
 # ── main loop ─────────────────────────────────────────────────────────────────
 def main():
     # Discover or parse game IDs
@@ -464,6 +516,16 @@ def main():
     if not games:
         print("No games found for tonight.")
         sys.exit(0)
+
+    # ── time-window gate ──────────────────────────────────────────────────────
+    if len(sys.argv) <= 1:   # only auto-gated in schedule-discovery mode
+        window_start, window_end = _tonight_window()
+        now_et = datetime.now(ET)
+        if now_et > window_end:
+            print("Tonight's game window has ended (past 1:30 AM ET). Exiting.")
+            sys.exit(0)
+        if now_et < window_start:
+            wait_for_tipoff(window_start, games)
 
     print(f"Tracking {len(games)} game(s): "
           f"{', '.join(g['away_tri']+'@'+g['home_tri'] for g in games)}")
