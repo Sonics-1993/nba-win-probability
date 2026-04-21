@@ -1,0 +1,11 @@
+cache/odds_*/
+cache/games_*_raw.json
+cache/games_*_pitchers.json
+cache/pitcher_starts*.json
+cache/blended_srs*.csv
+cache/cum_srs*.csv
+cache/pitcher_era*.csv
+cache/training_data*.csv
+__pycache__/
+*.pyc
+.env
