@@ -15,6 +15,17 @@ snapshots/
 models/
 training_index.json
 
+# ── MLB model generated cache data (re-creatable from pipeline scripts) ───
+mlb-model/cache/*.csv
+mlb-model/cache/*.json
+mlb-model/cache/totals_2025/
+# park_factors.json is manually curated — tracked via explicit git add
+
+# ── Home-directory noise ───────────────────────────────────────────────────
+resolv.conf
+.gitconfig
+opening-lines/
+
 # ── Python ────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]

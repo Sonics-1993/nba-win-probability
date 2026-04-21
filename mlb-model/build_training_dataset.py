@@ -9,6 +9,7 @@ Usage:
 import argparse
 import csv
 import json
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
@@ -22,6 +23,23 @@ LEAGUE_AVG_RUNS = 8.8
 def load_csv(path: Path) -> list[dict]:
     with open(path, newline="") as f:
         return list(csv.DictReader(f))
+
+
+def build_roll10(games: list[dict]) -> dict[tuple, float]:
+    """Rolling 10-game avg run diff per team, shift(1) to avoid leakage. Key: (game_pk, side)."""
+    team_history: dict[str, list[float]] = defaultdict(list)
+    result: dict[tuple, float] = {}
+    for g in sorted(games, key=lambda x: (x["date"], x["gamePk"])):
+        pk = g["gamePk"]
+        home, away = g["home_abbr"], g["away_abbr"]
+        h_hist, a_hist = team_history[home], team_history[away]
+        if len(h_hist) >= 3:
+            result[(pk, "home")] = sum(h_hist[-10:]) / len(h_hist[-10:])
+        if len(a_hist) >= 3:
+            result[(pk, "away")] = sum(a_hist[-10:]) / len(a_hist[-10:])
+        h_hist.append(float(g["run_diff"]))
+        a_hist.append(-float(g["run_diff"]))
+    return result
 
 
 def build_rest_days(games: list[dict]) -> dict[tuple, int]:
@@ -76,7 +94,12 @@ def main():
         raw = json.loads(pf_file.read_text())
         park_factors = {k: v for k, v in raw.items() if not k.startswith("_")}
 
-    rest_map = build_rest_days(games)
+    rest_map   = build_rest_days(games)
+    roll10_map = build_roll10(games)
+    wx_file    = CACHE / f"weather_{s}.csv"
+    wx_map     = ({int(r["game_pk"]): r for r in load_csv(wx_file)}
+                  if wx_file.exists() else {})
+
     rows, missing_odds, missing_srs = [], 0, 0
 
     for g in games:
@@ -88,32 +111,42 @@ def main():
         away_srs = srs_map.get((date, away), 0.0)
         if home_srs == 0.0 and away_srs == 0.0:
             missing_srs += 1
-        pf       = park_factors.get(home, 1.0)
+        pf          = park_factors.get(home, 1.0)
+        home_roll10 = roll10_map.get((pk, "home"))
+        away_roll10 = roll10_map.get((pk, "away"))
+        roll10_diff = round(home_roll10 - away_roll10, 4) if (home_roll10 is not None and away_roll10 is not None) else ""
+        wx          = wx_map.get(pk, {})
         rows.append({
-            "date":        date, "game_pk": pk, "home": home, "away": away,
-            "home_runs":   g["home_runs"], "away_runs": g["away_runs"],
-            "run_diff":    g["run_diff"],  "home_win":  int(g["home_win"]),
-            "home_srs":    round(home_srs, 4),
-            "away_srs":    round(away_srs, 4),
-            "srs_diff":    round(home_srs - away_srs, 4),
-            "home_era":    round(era_map.get((pk, "home"), REPLACEMENT_ERA), 3),
-            "away_era":    round(era_map.get((pk, "away"), REPLACEMENT_ERA), 3),
-            "era_diff":    round(era_map.get((pk, "away"), REPLACEMENT_ERA)
-                                 - era_map.get((pk, "home"), REPLACEMENT_ERA), 3),
-            "home_rest":   rest_map.get((date, home), 3),
-            "away_rest":   rest_map.get((date, away), 3),
-            "rest_diff":   rest_map.get((date, home), 3) - rest_map.get((date, away), 3),
-            "park_factor": round(pf, 3),
-            "park_adj":    round((pf - 1.0) * LEAGUE_AVG_RUNS / 2, 3),
-            "open_rl":     f"{float(odds['open_rl']):.2f}"  if odds and odds.get("open_rl")  else "",
-            "close_rl":    f"{float(odds['close_rl']):.2f}" if odds and odds.get("close_rl") else "",
-            "venue":       g.get("venue", ""),
+            "date":         date, "game_pk": pk, "home": home, "away": away,
+            "home_runs":    g["home_runs"], "away_runs": g["away_runs"],
+            "run_diff":     g["run_diff"],  "home_win":  int(g["home_win"]),
+            "home_srs":     round(home_srs, 4),
+            "away_srs":     round(away_srs, 4),
+            "srs_diff":     round(home_srs - away_srs, 4),
+            "home_era":     round(era_map.get((pk, "home"), REPLACEMENT_ERA), 3),
+            "away_era":     round(era_map.get((pk, "away"), REPLACEMENT_ERA), 3),
+            "era_diff":     round(era_map.get((pk, "away"), REPLACEMENT_ERA)
+                                  - era_map.get((pk, "home"), REPLACEMENT_ERA), 3),
+            "home_rest":    rest_map.get((date, home), 3),
+            "away_rest":    rest_map.get((date, away), 3),
+            "rest_diff":    rest_map.get((date, home), 3) - rest_map.get((date, away), 3),
+            "park_factor":  round(pf, 3),
+            "park_adj":     round((pf - 1.0) * LEAGUE_AVG_RUNS / 2, 3),
+            "roll10_diff":  roll10_diff,
+            "temp_f":       wx.get("temp_f", ""),
+            "wind_mph":     wx.get("wind_mph", ""),
+            "tailwind_mph": wx.get("tailwind_mph", ""),
+            "is_outdoor":   wx.get("is_outdoor", ""),
+            "open_rl":      f"{float(odds['open_rl']):.2f}"  if odds and odds.get("open_rl")  else "",
+            "close_rl":     f"{float(odds['close_rl']):.2f}" if odds and odds.get("close_rl") else "",
+            "venue":        g.get("venue", ""),
         })
 
     out = CACHE / f"training_data_{s}.csv"
     fields = ["date","game_pk","home","away","home_runs","away_runs","run_diff","home_win",
               "home_srs","away_srs","srs_diff","home_era","away_era","era_diff",
-              "home_rest","away_rest","rest_diff","park_factor","park_adj",
+              "home_rest","away_rest","rest_diff","park_factor","park_adj","roll10_diff",
+              "temp_f","wind_mph","tailwind_mph","is_outdoor",
               "open_rl","close_rl","venue"]
     with open(out, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields)

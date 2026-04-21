@@ -28,11 +28,14 @@ def load_training_data(season: int) -> list[dict]:
 
 
 def predict(row: dict, mp) -> float:
+    roll10 = row.get("roll10_diff", "")
+    roll10_val = float(roll10) if roll10 != "" else 0.0
     return (
         mp.srs_weight  * float(row["srs_diff"])
         + mp.era_weight  * float(row["era_diff"])
         + mp.rest_weight * float(row["rest_diff"])
-        + getattr(mp, "park_weight", 0.0) * float(row.get("park_adj", 0))
+        + getattr(mp, "park_weight",   0.0) * float(row.get("park_adj", 0))
+        + getattr(mp, "roll10_weight", 0.0) * roll10_val
         + mp.hca
         + mp.intercept
     )
