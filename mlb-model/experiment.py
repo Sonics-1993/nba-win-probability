@@ -2,12 +2,14 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 7: joint re-optimization with FIP cap + asymmetric weighting in place.
-# Grid: alpha=0.7 (more extreme ace weighting), sp↑, bp↓, park↓, off↑.
+# Experiment 8: cap bullpen ERA at 6.0 — BP ERA p90=5.93, >6.0 affects 273 team-games.
+# High BP ERA early in season is noisy; capping reduces overweighting bad early bullpens.
+# train improves +0.0016, holdout roughly neutral.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
-FIP_CAP = 5.5   # cap starter FIP — p99 is 5.56, only ~9 train games exceed this
+FIP_CAP    = 5.5  # starter FIP cap
+BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
@@ -44,7 +46,7 @@ def predict(row: dict) -> float:
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
     sp_runs   = (0.7 * sp_worse + 1.3 * sp_better)                          * sp_weight
-    bp_runs  = (f("home_bp_era") + f("away_bp_era"))                        * bp_weight
+    bp_runs  = (min(f("home_bp_era"), BP_ERA_CAP) + min(f("away_bp_era"), BP_ERA_CAP)) * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
     wind_adj = (f("tailwind_mph") * wind_weight) if outdoor else 0.0
