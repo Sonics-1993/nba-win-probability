@@ -121,20 +121,23 @@ def load_park_factors() -> dict[str, float]:
     return json.loads(p.read_text()) if p.exists() else {}
 
 
-def load_srs(season: int = 2025) -> dict[str, float]:
-    """Load latest SRS per team from blended_srs_{season}.csv."""
-    f = CACHE / f"blended_srs_{season}.csv"
+def load_srs(season: int) -> dict[str, float]:
+    """Load latest power ratings (pure regular-season SRS) for the given season.
+    Prefers cum_srs (no preseason contamination) over blended_srs."""
+    f = CACHE / f"cum_srs_{season}.csv"
+    col = "cum_srs"
     if not f.exists():
-        f = CACHE / f"cum_srs_{season}.csv"
+        f = CACHE / f"blended_srs_{season}.csv"
+        col = "blended_srs"
     if not f.exists():
         return {}
     latest: dict[str, tuple[str, float]] = {}
     for row in csv.DictReader(open(f)):
         team = row["team"]
         d    = row["date"]
-        srs  = float(row.get("blended_srs", row.get("cum_srs", 0)))
+        val  = float(row.get(col, 0))
         if team not in latest or d > latest[team][0]:
-            latest[team] = (d, srs)
+            latest[team] = (d, val)
     return {t: v[1] for t, v in latest.items()}
 
 
@@ -404,9 +407,9 @@ def main():
     exp   = load_experiment()
     mp    = load_model_params()
     pf    = load_park_factors()
-    srs   = load_srs(2025)          # 2025 end-of-season SRS as 2026 proxy
+    srs   = load_srs(args.season)
     games_2026 = load_games_2026()
-    print(f"  SRS loaded for {len(srs)} teams (end-of-2025 as proxy)")
+    print(f"  Power ratings loaded for {len(srs)} teams ({args.season} regular season)")
 
     # Fetch all market odds once (covers all upcoming games)
     print("\nFetching market odds (h2h + spreads + totals)…")
@@ -510,7 +513,7 @@ def main():
                   f"{prob_to_american(p_home_rl):>5} {fmt_american(mkt_rl_home):>6} {fmt_american(mkt_rl_away):>6}  "
                   f"{pred_total:>5.1f} {mkt_ou or ' N/A':>5} {ou_edge:>5}")
 
-        print("\nNOTE: Run diff σ=4.6 (empirical 2025). ML/RL model uses end-2025 SRS.")
+        print(f"\nNOTE: Run diff σ=4.6 (empirical 2025). ML/RL model uses {args.season} regular-season power ratings.")
         print("      TBD pitcher = replacement FIP 4.40. Edge = model O/U minus market O/U.")
 
 
