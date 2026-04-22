@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 172: outdoor_intercept = 0.7 — continue trend from 0.6 (best train -0.0231).
-# Hypothesis: 0.6 kept train -0.0231; see if 0.7 extends further.
+# Experiment 173: fatigue_weight = -0.23 — one step below -0.22 (kept).
+# Hypothesis: -0.22 kept; test one more step below floor.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -20,7 +20,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.22  # bullpen 3-day IP fatigue — EXP 164: try -0.22 (was -0.21)
+fatigue_weight = -0.23  # bullpen 3-day IP fatigue — EXP 173: try -0.23 (was -0.22)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.29   # ERA-FIP last-3 divergence — EXP 166: try 0.29 (was 0.28)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
