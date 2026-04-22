@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 30: Ace asymmetry ratio — try 1.5×ace / 0.5×weaker (was 1.4×/0.6×).
-# Hypothesis: stronger ace weighting may compress totals more effectively when
-# one pitcher clearly dominates. The gap_weight captures gap size; this captures directionality.
+# Experiment 44: park_weight fine-tune to 2.2 (was 2.0).
+# Hypothesis: park factors haven't been touched since the original baseline.
+# A slightly higher weight on extreme parks (COL=1.40, MIA=0.93) may sharpen predictions.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -15,7 +15,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.40   # starter FIP contribution — EXPERIMENT 15: try 0.40 (was 0.45)
 bp_weight      = 0.35   # bullpen ERA contribution
-park_weight    = 2.0    # park factor deviation
+park_weight    = 2.2    # park factor deviation — EXP 44: try 2.2 (was 2.0)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.15   # rolling 10-game runs scored (both teams)
