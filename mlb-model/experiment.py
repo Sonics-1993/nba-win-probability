@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 132: outdoor_intercept = 0.3 — add flat outdoor run-environment term.
-# Hypothesis: outdoor games under-predicted by -0.74 runs (vs dome -0.11); add 0.3 intercept.
+# Experiment 135: park_weight = -0.9 — continue downward trend from -0.6.
+# Hypothesis: -0.6 kept; direction still active; try -0.9 with holdout guard.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.33   # bullpen ERA contribution — EXP 116: restore 0.33 (optimum)
-park_weight    = -0.6   # park factor deviation — EXP 131: try -0.6 (was -0.3)
+park_weight    = -0.9   # park factor deviation — EXP 135: try -0.9 (was -0.6)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
