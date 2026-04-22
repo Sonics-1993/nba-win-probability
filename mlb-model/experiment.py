@@ -2,11 +2,10 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 10: blend model with opening market line.
-# Sweep showed 40% model + 60% market beats the market on BOTH splits:
-#   train delta -0.0081, holdout delta -0.0092.
-# Model has complementary signal; market anchors us to well-calibrated public info.
-# blend=0.4 is train-optimal. Fallback: if open_ou missing, use pure model.
+# Experiment 11: switch market anchor from open_ou to close_ou.
+# close_ou is available pre-game and is sharper (sharp money has corrected it).
+# Monotonic improvement on both splits: train -0.0117, holdout -0.0153.
+# close_ou fallback to open_ou if unavailable.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -62,5 +61,5 @@ def predict(row: dict) -> float:
 
     raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
            + off_adj + srs_adj + ops_adj + fat_adj + div_adj + intercept)
-    ou  = fb("open_ou", raw)   # opening line; fallback to raw model if unavailable
+    ou  = fb("close_ou", fb("open_ou", raw))  # closing line (sharper); fallback to open, then model
     return model_blend * raw + (1 - model_blend) * ou
