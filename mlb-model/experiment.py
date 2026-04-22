@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 83: fatigue_weight = -0.16 (was -0.15).
-# Hypothesis: -0.15 kept; check if -0.16 continues the trend or overshoots.
+# Experiment 85: sp_weight = 0.41 (was 0.40).
+# Hypothesis: 0.38 worsened; check upward direction for starter FIP weight.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -12,7 +12,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
-sp_weight      = 0.40   # starter FIP contribution — EXPERIMENT 15: try 0.40 (was 0.45)
+sp_weight      = 0.41   # starter FIP contribution — EXP 85: try 0.41 (was 0.40)
 bp_weight      = 0.35   # bullpen ERA contribution
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
