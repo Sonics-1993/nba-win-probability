@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 105: fatigue_weight = -0.19 (was -0.18).
-# Hypothesis: -0.18 still improved train. Continue to find ceiling of fatigue signal.
+# Experiment 108: model_blend = 0.33 (was 0.34).
+# Hypothesis: 0.33 was ruled out pre-park2 but untested in new context. Test cautiously.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept      = 0.00
-model_blend    = 0.34   # EXP 90: try 0.34 (was 0.35)
+model_blend    = 0.33   # EXP 108: try 0.33 (was 0.34) — untested post-park2
 
 
 def predict(row: dict) -> float:
