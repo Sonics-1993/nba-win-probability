@@ -2,24 +2,24 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 2: remove SRS (srs_weight=0).
-# Ablation showed removing SRS improves train (-0.007) and holdout (-0.005).
-# SRS captures run differential vs schedule — likely redundant with roll10 runs scored.
+# Experiment 3: grid search on active weights after removing OPS+SRS.
+# Grid found: fip_blend=0 (pure cumulative FIP), higher bp/park, slightly lower offense+sp.
+# Expected train delta +0.0326 vs current +0.0373.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
 
 # --- Weights: tune freely ---
-fip_blend      = 0.2    # 0–1: weight on last-3 FIP vs cumulative FIP
-sp_weight      = 0.50   # starter FIP contribution
-bp_weight      = 0.30   # bullpen ERA contribution
-park_weight    = 2.0    # park factor deviation
+fip_blend      = 0.0    # pure cumulative FIP — last-3 adds noise without OPS/SRS context
+sp_weight      = 0.45   # starter FIP contribution
+bp_weight      = 0.35   # bullpen ERA contribution (up — BP matters more without SRS)
+park_weight    = 3.0    # park factor deviation (up — extreme parks matter more)
 temp_weight    = 0.00   # temperature effect (outdoor only) — confirmed dead signal
 wind_weight    = 0.00   # tailwind mph (outdoor only) — confirmed dead signal
-offense_weight = 0.15   # rolling 10-game runs scored (both teams)
-srs_weight     = 0.00   # EXPERIMENT 2: ablated — redundant with roll10, hurts both splits
-ops_weight     = 0.0    # EXPERIMENT 1: ablated — collinear with roll10, hurts both train and holdout
-fatigue_weight = -0.05  # bullpen 3-day IP fatigue (negative = regression signal)
+offense_weight = 0.13   # rolling 10-game runs scored (both teams)
+srs_weight     = 0.00   # ablated experiment 2
+ops_weight     = 0.00   # ablated experiment 1
+fatigue_weight = -0.07  # slightly stronger fatigue regression signal
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 intercept      = 0.00
 
