@@ -2,14 +2,14 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 28: FIP cap sensitivity — try FIP_CAP = 5.25 (was 5.5).
-# Hypothesis: tighter cap reduces noise from outlier bad pitchers; better signal
-# from the range where FIP is most predictive (4.0-5.25 range).
+# Experiment 29: BP ERA cap sensitivity — try BP_ERA_CAP = 5.75 (was 6.0).
+# Hypothesis: tighter bullpen ERA cap reduces noise from outlier bad bullpens,
+# especially early-season small sample flukes above 5.75 ERA.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
 FIP_CAP    = 5.25  # starter FIP cap — EXPERIMENT 28: try 5.25 (was 5.5)
-BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
+BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
