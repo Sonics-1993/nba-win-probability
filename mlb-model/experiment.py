@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 158: park2_weight = 17.0 — re-test in new park_weight=-2.1 context.
-# Hypothesis: 17.0 reverted in session 5 at park_weight=-0.6; different context now.
+# Experiment 159: outdoor_intercept = 0.4 — midpoint between 0.3 (kept) and 0.5 (reverted).
+# Hypothesis: 0.3 kept, 0.5 reverted in session 5; 0.4 untested.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.27   # ERA-FIP last-3 divergence — EXP 148: try 0.27 (was 0
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 17.0   # EXP 158: park factor quadratic term — try 17.0 (was 16.0)
 intercept          = 0.00
-outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
+outdoor_intercept  = 0.4   # EXP 159: try 0.4 (was 0.3) — midpoint between kept 0.3 and reverted 0.5
 model_blend    = 0.30   # EXP 139: try 0.30 (was 0.31) — one step further toward market floor
 
 
