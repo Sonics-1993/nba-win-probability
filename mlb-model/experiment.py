@@ -2,12 +2,12 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 5: asymmetric starter weighting — ace (lower FIP) gets 1.2× weight, weak starter 0.8×.
-# Hypothesis: the better pitcher dominates game total more than the weaker pitcher.
-# alpha=0.8 → (0.8 * max_fip + 1.2 * min_fip) * sp_weight. Train-optimal from sweep.
+# Experiment 6: cap starter FIP at 5.5 — extreme outliers (9 games train, 19 holdout) are
+# overweighted. Capping improves both train (+0.0007) and holdout (+0.0002) consistently.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
+FIP_CAP = 5.5   # cap starter FIP — p99 is 5.56, only ~9 train games exceed this
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP — last-3 adds noise without OPS/SRS context
@@ -36,10 +36,10 @@ def predict(row: dict) -> float:
 
     outdoor = f("is_outdoor") > 0
 
-    home_sp = fb("home_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) + \
-              fb("home_l3_fip", REPLACEMENT_FIP) * fip_blend
-    away_sp = fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) + \
-              fb("away_l3_fip", REPLACEMENT_FIP) * fip_blend
+    home_sp = min(fb("home_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) +
+                  fb("home_l3_fip", REPLACEMENT_FIP) * fip_blend, FIP_CAP)
+    away_sp = min(fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) +
+                  fb("away_l3_fip", REPLACEMENT_FIP) * fip_blend, FIP_CAP)
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
