@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 97: park2_weight = 5.0 (was 4.0).
-# Hypothesis: 4.0 kept (holdout -0.0099, train -0.0207); push further — train slipped, need to find the ceiling.
+# Experiment 98: park2_weight = 6.0 (was 5.0).
+# Hypothesis: 5.0 kept with holdout -0.0102 (best this session) but train -0.0206; check if trend continues.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.16  # bullpen 3-day IP fatigue — EXP 83: try -0.16 (was -0
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 5.0    # EXP 97: park factor quadratic term — try 5.0 (was 4.0)
+park2_weight   = 6.0    # EXP 98: park factor quadratic term — try 6.0 (was 5.0)
 intercept      = 0.00
 model_blend    = 0.34   # EXP 90: try 0.34 (was 0.35)
 
