@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 52: gap_weight fine-tune to -0.15 (was -0.12 after EXP 51 kept).
-# Hypothesis: -0.12 improved both splits; test if -0.15 continues improving or overfits.
+# Experiment 53: gap_weight fine-tune to -0.18 (was -0.15 after EXP 52 kept).
+# Hypothesis: -0.15 improved train further; test if -0.18 continues the trend.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -23,7 +23,7 @@ ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
-gap_weight     = -0.15  # abs SP FIP gap — EXP 52: try -0.15 (was -0.12)
+gap_weight     = -0.18  # abs SP FIP gap — EXP 53: try -0.18 (was -0.15)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
