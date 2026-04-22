@@ -2,13 +2,13 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 27: SP FIP gap weight — try gap_weight = -0.10 (was -0.05).
-# Hypothesis: gap signal still has room to grow; double the penalty to find peak.
-# The ace dominance compression effect may be stronger than -0.05 captures.
+# Experiment 28: FIP cap sensitivity — try FIP_CAP = 5.25 (was 5.5).
+# Hypothesis: tighter cap reduces noise from outlier bad pitchers; better signal
+# from the range where FIP is most predictive (4.0-5.25 range).
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
-FIP_CAP    = 5.5  # starter FIP cap
+FIP_CAP    = 5.25  # starter FIP cap — EXPERIMENT 28: try 5.25 (was 5.5)
 BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
 
 # --- Weights: tune freely ---
