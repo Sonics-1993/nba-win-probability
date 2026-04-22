@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 81: offense_weight = 0.19 (was 0.18).
-# Hypothesis: narrow the optimum around 0.18; small upward step may capture more offensive signal.
+# Experiment 82: fatigue_weight = -0.15 (was -0.14).
+# Hypothesis: session 2 showed fatigue signal still active; try -0.15 now that offense_weight moved to 0.19.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -20,7 +20,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.14  # bullpen 3-day IP fatigue — EXP 74: try -0.14 (was -0.13)
+fatigue_weight = -0.15  # bullpen 3-day IP fatigue — EXP 82: try -0.15 (was -0.14)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
