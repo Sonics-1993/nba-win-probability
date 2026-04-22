@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 86: sp_weight = 0.42 (was 0.41).
-# Hypothesis: 0.41 kept well; push one more step up to find the ceiling.
+# Experiment 88: bp_weight = 0.33 (was 0.35).
+# Hypothesis: with sp_weight at 0.42, check if bullpen weight has headroom downward.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -13,7 +13,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
-bp_weight      = 0.35   # bullpen ERA contribution
+bp_weight      = 0.33   # bullpen ERA contribution — EXP 88: try 0.33 (was 0.35)
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
