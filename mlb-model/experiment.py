@@ -2,10 +2,10 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 17: BP weight fine-tune — try bp_weight = 0.40 (was 0.35).
-# Hypothesis: since sp_weight was reduced to 0.40, the freed-up model budget
-# might benefit bullpen, which may have additive signal beyond the market.
-# Test: bp_weight = 0.40 (was 0.35), sp_weight stays at 0.40.
+# Experiment 15: SP weight fine-tune — try sp_weight = 0.40 (was 0.45).
+# Hypothesis: starter quality may be slightly over-weighted; the FIP signal
+# is already captured in the market line. Reduce to 0.40 and see if raw
+# model quality improves when blended back with close_ou.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -15,7 +15,7 @@ BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.40   # starter FIP contribution — EXPERIMENT 15: try 0.40 (was 0.45)
-bp_weight      = 0.40   # bullpen ERA contribution — EXPERIMENT 17: try 0.40 (was 0.35)
+bp_weight      = 0.35   # bullpen ERA contribution
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
