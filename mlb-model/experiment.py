@@ -2,15 +2,14 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 62: model_blend fine-tune to 0.35 (was 0.37 after EXP 61 kept).
-# Hypothesis: 0.37 improved both splits; test 0.35 to see if trend continues or plateaus.
-# Note: 0.35 was previously reverted in an earlier session, but context (gap/offense weights)
-# has changed significantly — worth retesting.
+# Experiment 67: BP_ERA_CAP sensitivity — try 5.5 (was 5.75).
+# Hypothesis: tighter bullpen ERA cap dampens early-season BP outliers more aggressively,
+# which may reduce noise for the worst-performing bullpens.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
 FIP_CAP    = 5.25  # starter FIP cap — EXPERIMENT 28: try 5.25 (was 5.5)
-BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
+BP_ERA_CAP = 5.5   # bullpen ERA cap — EXP 67: try 5.5 (was 5.75)
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
