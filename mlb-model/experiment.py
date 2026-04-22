@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 160: era_fip_div_w = 0.28 — one step above 0.27 (kept borderline).
-# Hypothesis: 0.27 kept; continue to see if signal has more room.
+# Experiment 161: fatigue_weight = -0.21 — one step below -0.20 (kept).
+# Hypothesis: -0.20 kept in session 5; continue trend toward floor ~-0.22.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -20,7 +20,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.20  # bullpen 3-day IP fatigue — EXP 149: try -0.20 (was -0.19)
+fatigue_weight = -0.21  # bullpen 3-day IP fatigue — EXP 161: try -0.21 (was -0.20)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.28   # ERA-FIP last-3 divergence — EXP 160: try 0.28 (was 0.27)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
