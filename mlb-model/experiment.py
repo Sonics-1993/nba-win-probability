@@ -2,26 +2,26 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 6: cap starter FIP at 5.5 — extreme outliers (9 games train, 19 holdout) are
-# overweighted. Capping improves both train (+0.0007) and holdout (+0.0002) consistently.
+# Experiment 7: joint re-optimization with FIP cap + asymmetric weighting in place.
+# Grid: alpha=0.7 (more extreme ace weighting), sp↑, bp↓, park↓, off↑.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
 FIP_CAP = 5.5   # cap starter FIP — p99 is 5.56, only ~9 train games exceed this
 
 # --- Weights: tune freely ---
-fip_blend      = 0.0    # pure cumulative FIP — last-3 adds noise without OPS/SRS context
-sp_weight      = 0.45   # starter FIP contribution
-bp_weight      = 0.35   # bullpen ERA contribution (up — BP matters more without SRS)
-park_weight    = 3.0    # park factor deviation (up — extreme parks matter more)
-temp_weight    = 0.00   # temperature effect (outdoor only) — confirmed dead signal
-wind_weight    = 0.00   # tailwind mph (outdoor only) — confirmed dead signal
-offense_weight = 0.13   # rolling 10-game runs scored (both teams)
+fip_blend      = 0.0    # pure cumulative FIP
+sp_weight      = 0.48   # starter FIP contribution (up slightly)
+bp_weight      = 0.32   # bullpen ERA contribution (down slightly)
+park_weight    = 2.5    # park factor deviation
+temp_weight    = 0.00   # confirmed dead signal
+wind_weight    = 0.00   # confirmed dead signal
+offense_weight = 0.15   # rolling 10-game runs scored (both teams)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.07  # slightly stronger fatigue regression signal
+fatigue_weight = -0.07  # bullpen 3-day IP fatigue
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.10   # EXPERIMENT 4: (l3_era - l3_fip) divergence — positive = more runs
+era_fip_div_w  = 0.10   # ERA-FIP last-3 divergence
 intercept      = 0.00
 
 
@@ -43,7 +43,7 @@ def predict(row: dict) -> float:
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
-    sp_runs   = (0.8 * sp_worse + 1.2 * sp_better)                          * sp_weight
+    sp_runs   = (0.7 * sp_worse + 1.3 * sp_better)                          * sp_weight
     bp_runs  = (f("home_bp_era") + f("away_bp_era"))                        * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
