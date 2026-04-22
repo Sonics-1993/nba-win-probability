@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import csv
 import importlib.util
 import json
 import os
@@ -95,6 +96,55 @@ def load_park_factors() -> dict:
         raw = json.loads(pf_file.read_text())
         return {k: float(v) for k, v in raw.items() if not k.startswith("_")}
     return {}
+
+
+def load_cached_bp_era(season: int, before_date: str | None = None) -> dict[str, float]:
+    """Return {team_abbr: shrinkage_bp_era} from the season game cache."""
+    BP_REPL   = 4.80
+    SHRINK    = 30.0
+    ASSUMED   = 9.0
+    games_file  = BASE / "cache" / f"games_{season}_raw.json"
+    starts_file = BASE / "cache" / f"pitcher_starts_{season}.json"
+    if not games_file.exists() or not starts_file.exists():
+        return {}
+    games  = json.load(games_file.open())
+    starts = json.load(starts_file.open())
+    if before_date:
+        games = [g for g in games if g["date"] < before_date]
+    tip: dict[str, float] = {}
+    ter: dict[str, float] = {}
+    for g in games:
+        pk_str = str(g["gamePk"])
+        sp = starts.get(pk_str, {})
+        for side_key, abbr, opp_runs in [
+            ("home_sp", g["home_abbr"], g["away_runs"]),
+            ("away_sp", g["away_abbr"], g["home_runs"]),
+        ]:
+            entry  = sp.get(side_key, {})
+            sp_ip  = float(entry.get("ip", 0) or 0)
+            sp_er  = float(entry.get("er", 0) or 0)
+            bp_ip  = max(0.0, ASSUMED - sp_ip)
+            bp_er  = max(0.0, float(opp_runs) - sp_er)
+            tip[abbr] = tip.get(abbr, 0.0) + bp_ip
+            ter[abbr] = ter.get(abbr, 0.0) + bp_er
+    return {abbr: (ter[abbr] * 9 + BP_REPL * SHRINK) / (tip[abbr] + SHRINK)
+            for abbr in tip}
+
+
+def load_cached_fatigue(season: int, game_date: str) -> dict[int, dict]:
+    """Return {game_pk: {home_bp_ip_3d, away_bp_ip_3d}} for the given date."""
+    fat_file = BASE / "cache" / f"bullpen_fatigue_{season}.csv"
+    if not fat_file.exists():
+        return {}
+    result: dict[int, dict] = {}
+    with open(fat_file, newline="") as f:
+        for row in csv.DictReader(f):
+            if row["date"] == game_date:
+                result[int(row["game_pk"])] = {
+                    "home_bp_ip_3d": float(row["home_bp_ip_3d"]),
+                    "away_bp_ip_3d": float(row["away_bp_ip_3d"]),
+                }
+    return result
 
 
 def fetch_today_games(game_date: str) -> list[dict]:
@@ -292,6 +342,14 @@ def main():
     ou_map = fetch_current_ou(api_key)
     print(f"  {len(ou_map)} games with O/U lines\n")
 
+    print("Loading cached BP ERA…")
+    bp_era_map = load_cached_bp_era(args.season, before_date=args.date)
+    print(f"  {len(bp_era_map)} teams with cached BP ERA\n")
+
+    print("Loading bullpen fatigue…")
+    fatigue_map = load_cached_fatigue(args.season, args.date)
+    print(f"  {len(fatigue_map)} games with fatigue data\n")
+
     print("Fetching pitcher stats…")
     pitcher_cache: dict[int, dict] = {}
     pitcher_ids = set()
@@ -329,8 +387,8 @@ def main():
             "away_sp_era":  ap["cum_era"],
             "home_l3_era":  hp["l3_era"],
             "away_l3_era":  ap["l3_era"],
-            "home_bp_era":  REPLACEMENT_BP,
-            "away_bp_era":  REPLACEMENT_BP,
+            "home_bp_era":  bp_era_map.get(home, REPLACEMENT_BP),
+            "away_bp_era":  bp_era_map.get(away, REPLACEMENT_BP),
             "park_factor":  park_factors.get(home, 1.0),
             "is_outdoor":   0 if home in DOME_PARKS else 1,
             "temp_f":       72.0,
@@ -341,8 +399,8 @@ def main():
             "away_ops":     "",
             "home_srs":     0.0,
             "away_srs":     0.0,
-            "home_bp_ip_3d": 0.0,
-            "away_bp_ip_3d": 0.0,
+            "home_bp_ip_3d": fatigue_map.get(g["game_pk"], {}).get("home_bp_ip_3d", 0.0),
+            "away_bp_ip_3d": fatigue_map.get(g["game_pk"], {}).get("away_bp_ip_3d", 0.0),
             "open_ou":      ou or "",
             "close_ou":     ou or "",
         }
@@ -359,7 +417,6 @@ def main():
               f"{ou_str:>5} {pred:>5.1f} {edge_str:>6}")
 
     print(f"{'─'*80}")
-    print("\nNote: bp_era uses replacement value (4.80) — run full pipeline for live BP stats.")
     print("Edge = model prediction minus current O/U line (positive = lean over).\n")
 
 

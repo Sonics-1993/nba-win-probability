@@ -17,9 +17,9 @@ from pathlib import Path
 BASE = Path(__file__).parent
 RESULTS = BASE / "results.tsv"
 
-# Baseline numbers from run 101 (autoresearch/apr21, park2_weight=10.0) — new floor to beat
-BASELINE_TRAIN_DELTA   = -0.0202
-BASELINE_HOLDOUT_DELTA = -0.0115
+# Baseline numbers from run 155 (autoresearch/apr21, bp_weight=0.29) — new floor to beat
+BASELINE_TRAIN_DELTA   = -0.0222
+BASELINE_HOLDOUT_DELTA = -0.0104
 
 
 def load_experiment():
