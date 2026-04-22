@@ -2,9 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 91: park factor quadratic term park2_w=1.0.
-# Hypothesis: extreme parks (Coors, pitcher parks) may have non-linear run effects;
-# adding (park_factor-1)^2 * park2_w captures this untested with current weights.
+# Experiment 92: park2_weight = 1.5 (was 1.0).
+# Hypothesis: 1.0 kept; push quadratic park term higher to see if more curvature helps.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -25,7 +24,7 @@ fatigue_weight = -0.16  # bullpen 3-day IP fatigue — EXP 83: try -0.16 (was -0
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 1.0    # EXP 91: park factor quadratic term — (park_factor-1)^2 * park2_weight
+park2_weight   = 1.5    # EXP 92: park factor quadratic term — try 1.5 (was 1.0)
 intercept      = 0.00
 model_blend    = 0.34   # EXP 90: try 0.34 (was 0.35)
 
