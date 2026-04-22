@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 162: model_blend = 0.29 — one step below 0.30 (kept).
-# Hypothesis: 0.30 kept; test if more market weight helps. Caution: may be floor.
+# Experiment 163: park_weight = -2.4 — continue trend from -2.1 (kept).
+# Hypothesis: -2.1 kept with small train gain; try one more step down.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.28   # bullpen ERA contribution — EXP 156: try 0.28 (was 0.29)
-park_weight    = -2.1   # park factor deviation — EXP 157: try -2.1 (was -1.8)
+park_weight    = -2.4   # park factor deviation — EXP 163: try -2.4 (was -2.1)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
