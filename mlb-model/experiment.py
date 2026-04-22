@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 23: Fatigue weight fine-tune — try fatigue_weight = -0.08 (was -0.07).
-# Hypothesis: slightly stronger bullpen fatigue penalty may improve predictions;
-# a tired bullpen gives up more runs on top of its ERA signal.
+# Experiment 24: Fatigue weight fine-tune — try fatigue_weight = -0.10 (was -0.08).
+# Hypothesis: fatigue signal continues to improve; push further to -0.10 to find peak.
+# Warning: holdout was diverging slightly at -0.08, so this may be the boundary.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -21,7 +21,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.15   # rolling 10-game runs scored (both teams)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.08  # bullpen 3-day IP fatigue — EXPERIMENT 23: try -0.08 (was -0.07)
+fatigue_weight = -0.10  # bullpen 3-day IP fatigue — EXPERIMENT 24: try -0.10 (was -0.08)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 intercept      = 0.00
