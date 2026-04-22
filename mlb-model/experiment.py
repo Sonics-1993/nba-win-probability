@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 93: park2_weight = 2.0 (was 1.5).
-# Hypothesis: 1.5 kept; try 2.0 to find ceiling of quadratic park benefit.
+# Experiment 94: park2_weight = 2.5 (was 2.0).
+# Hypothesis: 2.0 kept; push further to locate the ceiling of the quadratic park signal.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.16  # bullpen 3-day IP fatigue — EXP 83: try -0.16 (was -0
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 2.0    # EXP 93: park factor quadratic term — try 2.0 (was 1.5)
+park2_weight   = 2.5    # EXP 94: park factor quadratic term — try 2.5 (was 2.0)
 intercept      = 0.00
 model_blend    = 0.34   # EXP 90: try 0.34 (was 0.35)
 
