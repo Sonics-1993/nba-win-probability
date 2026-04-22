@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 137: park_weight = -1.5 — continue downward trend from -1.2.
-# Hypothesis: -1.2 kept; direction still active; try -1.5.
+# Experiment 138: park_weight = -1.8 — continue downward trend from -1.5.
+# Hypothesis: -1.5 kept; direction still active; try -1.8. Holdout eroding slightly — apply guard.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.33   # bullpen ERA contribution — EXP 116: restore 0.33 (optimum)
-park_weight    = -1.5   # park factor deviation — EXP 137: try -1.5 (was -1.2)
+park_weight    = -1.8   # park factor deviation — EXP 138: try -1.8 (was -1.5)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
