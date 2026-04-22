@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 157: park_weight = -2.1 — continue trend from -1.8.
-# Hypothesis: -1.8 kept; continue pushing more negative.
+# Experiment 158: park2_weight = 17.0 — re-test in new park_weight=-2.1 context.
+# Hypothesis: 17.0 reverted in session 5 at park_weight=-0.6; different context now.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.20  # bullpen 3-day IP fatigue — EXP 149: try -0.20 (was -
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.27   # ERA-FIP last-3 divergence — EXP 148: try 0.27 (was 0.26)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 16.0   # EXP 145: park factor quadratic term — try 16.0 (was 15.0)
+park2_weight   = 17.0   # EXP 158: park factor quadratic term — try 17.0 (was 16.0)
 intercept          = 0.00
 outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
 model_blend    = 0.30   # EXP 139: try 0.30 (was 0.31) — one step further toward market floor
