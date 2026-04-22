@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 161: fatigue_weight = -0.21 — one step below -0.20 (kept).
-# Hypothesis: -0.20 kept in session 5; continue trend toward floor ~-0.22.
+# Experiment 162: model_blend = 0.29 — one step below 0.30 (kept).
+# Hypothesis: 0.30 kept; test if more market weight helps. Caution: may be floor.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -27,7 +27,7 @@ gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 17.0   # EXP 158: park factor quadratic term — try 17.0 (was 16.0)
 intercept          = 0.00
 outdoor_intercept  = 0.4   # EXP 159: try 0.4 (was 0.3) — midpoint between kept 0.3 and reverted 0.5
-model_blend    = 0.30   # EXP 139: try 0.30 (was 0.31) — one step further toward market floor
+model_blend    = 0.29   # EXP 162: try 0.29 (was 0.30) — one step further toward market floor
 
 
 def predict(row: dict) -> float:
