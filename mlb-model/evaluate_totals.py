@@ -22,6 +22,8 @@ sys.path.insert(0, str(BASE))
 
 REPLACEMENT_ERA = 4.50
 REPLACEMENT_FIP = 4.40
+FIP_CAP    = 5.5
+BP_ERA_CAP = 6.0
 
 
 def load_data(season: int = 2025) -> list[dict]:
@@ -36,31 +38,41 @@ def predict(row: dict, mp) -> float:
     def f(col): return float(row[col]) if row.get(col, "") not in ("", None) else 0.0
     def fb(col, fallback): return float(row[col]) if row.get(col, "") not in ("", None) else fallback
 
-    outdoor = f("is_outdoor") > 0
+    outdoor  = f("is_outdoor") > 0
+    fip_cap  = getattr(mp, "FIP_CAP",    FIP_CAP)
+    bp_cap   = getattr(mp, "BP_ERA_CAP", BP_ERA_CAP)
+    fb_blend = getattr(mp, "fip_blend",  0.0)
 
-    # Starter quality: blend cumulative FIP with last-3 FIP for recency
-    fip_blend  = getattr(mp, "fip_blend", 0.0)   # weight on last-3 vs cumulative
-    home_sp = fb("home_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) + \
-              fb("home_l3_fip", REPLACEMENT_FIP) * fip_blend
-    away_sp = fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) + \
-              fb("away_l3_fip", REPLACEMENT_FIP) * fip_blend
+    home_sp = min(fb("home_sp_fip", REPLACEMENT_FIP) * (1 - fb_blend) +
+                  fb("home_l3_fip", REPLACEMENT_FIP) * fb_blend, fip_cap)
+    away_sp = min(fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fb_blend) +
+                  fb("away_l3_fip", REPLACEMENT_FIP) * fb_blend, fip_cap)
 
-    sp_runs  = (home_sp + away_sp)                        * getattr(mp, "sp_weight",      0.50)
-    bp_runs  = (f("home_bp_era") + f("away_bp_era"))      * getattr(mp, "bp_weight",      0.30)
-    park_adj = (f("park_factor") - 1.0)                   * getattr(mp, "park_weight",    2.0)
-    # Weather only applies to outdoor games
+    # Asymmetric: ace (lower FIP) gets 1.4x weight, weaker starter 0.6x
+    sp_better = min(home_sp, away_sp)
+    sp_worse  = max(home_sp, away_sp)
+    sp_runs  = (0.6 * sp_worse + 1.4 * sp_better)               * getattr(mp, "sp_weight",      0.45)
+    bp_runs  = (min(f("home_bp_era"), bp_cap) +
+                min(f("away_bp_era"), bp_cap))                   * getattr(mp, "bp_weight",      0.35)
+    park_adj = (f("park_factor") - 1.0)                          * getattr(mp, "park_weight",    2.0)
     temp_adj = ((f("temp_f") - 72.0) * getattr(mp, "temp_weight", 0.0)) if outdoor else 0.0
     wind_adj = (f("tailwind_mph")     * getattr(mp, "wind_weight", 0.0)) if outdoor else 0.0
-    off_adj  = (f("home_roll10") + f("away_roll10"))       * getattr(mp, "offense_weight", 0.15)
-    srs_adj  = (f("home_srs")    + f("away_srs"))          * getattr(mp, "srs_weight",     0.15)
+    off_adj  = (f("home_roll10") + f("away_roll10"))              * getattr(mp, "offense_weight", 0.15)
+    srs_adj  = (f("home_srs")    + f("away_srs"))                 * getattr(mp, "srs_weight",     0.0)
     ops_adj  = (fb("home_ops", 0.720) + fb("away_ops", 0.720) - 1.440) \
-                                                            * getattr(mp, "ops_weight",     0.0)
-    # Bullpen fatigue: deviation from training-mean combined 3-day BP IP (11.62)
+                                                                   * getattr(mp, "ops_weight",     0.0)
     fat_adj  = (f("home_bp_ip_3d") + f("away_bp_ip_3d") - getattr(mp, "fatigue_center", 11.62)) \
-                                                            * getattr(mp, "fatigue_weight", 0.0)
+                                                                   * getattr(mp, "fatigue_weight", 0.0)
+    div_adj  = ((fb("home_l3_era", REPLACEMENT_ERA) - fb("home_l3_fip", REPLACEMENT_FIP)) +
+                (fb("away_l3_era", REPLACEMENT_ERA) - fb("away_l3_fip", REPLACEMENT_FIP))) \
+                                                                   * getattr(mp, "era_fip_div_w",  0.0)
 
-    return (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
-            + off_adj + srs_adj + ops_adj + fat_adj + getattr(mp, "intercept", 0.0))
+    raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
+           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + getattr(mp, "intercept", 0.0))
+
+    blend = getattr(mp, "model_blend", 1.0)
+    ou    = fb("close_ou", fb("open_ou", raw))
+    return blend * raw + (1 - blend) * ou
 
 
 def main():
@@ -73,18 +85,22 @@ def main():
     import totals_params as mp
     importlib.reload(mp)
 
-    rows = [r for r in load_data() if r.get("open_ou")]
+    rows = [r for r in load_data() if r.get("open_ou") or r.get("close_ou")]
     for r in rows:
-        r["open_ou"]    = float(r["open_ou"])
+        if r.get("open_ou"):  r["open_ou"]  = float(r["open_ou"])
+        if r.get("close_ou"): r["close_ou"] = float(r["close_ou"])
         r["total_runs"] = float(r["total_runs"])
 
     train   = [r for r in rows if r["date"] < "2025-08"]
     holdout = [r for r in rows if r["date"] >= "2025-08"]
 
+    def _mkt_ou(r):
+        return r.get("close_ou") or r.get("open_ou")
+
     def score(subset, label):
         if not subset: return
         pred_errors   = [abs(predict(r, mp) - r["total_runs"]) for r in subset]
-        market_errors = [abs(r["open_ou"] - r["total_runs"]) for r in subset]
+        market_errors = [abs(_mkt_ou(r) - r["total_runs"]) for r in subset if _mkt_ou(r)]
         mae  = sum(pred_errors)   / len(pred_errors)
         mmae = sum(market_errors) / len(market_errors)
         print(f"[{label}] N={len(subset)}  Model MAE={mae:.4f}  Market MAE={mmae:.4f}  Delta={mae-mmae:+.4f}")
@@ -100,16 +116,17 @@ def main():
         for m in sorted(by_month):
             sub  = by_month[m]
             mae  = sum(abs(predict(r, mp) - r["total_runs"]) for r in sub) / len(sub)
-            mmae = sum(abs(r["open_ou"]   - r["total_runs"]) for r in sub) / len(sub)
+            mmae = sum(abs(_mkt_ou(r) - r["total_runs"]) for r in sub if _mkt_ou(r)) / len(sub)
             print(f"{m:10} {len(sub):>5} {mae:>7.4f} {mmae:>7.4f} {mae-mmae:>+7.4f}")
 
     if args.worst:
         results = sorted(rows, key=lambda r: -abs(predict(r, mp) - r["total_runs"]))[:args.worst]
         print(f"\n{'Date':12} {'Game':14} {'Pred':>6} {'Line':>6} {'Act':>5} {'Err':>6}")
         for r in results:
-            p = predict(r, mp)
+            p  = predict(r, mp)
+            ou = _mkt_ou(r) or 0.0
             print(f"{r['date']:12} {r['away']:>3}@{r['home']:<3}  "
-                  f"{p:>6.1f}  {r['open_ou']:>6.1f}  {r['total_runs']:>5.0f}  {p - r['total_runs']:>+6.1f}")
+                  f"{p:>6.1f}  {ou:>6.1f}  {r['total_runs']:>5.0f}  {p - r['total_runs']:>+6.1f}")
 
     if args.grid_search:
         import numpy as np
@@ -121,7 +138,8 @@ def main():
                              for r in train])
 
         acts    = arr("total_runs")
-        mkt     = arr("open_ou")
+        mkt     = np.array([float(r.get("close_ou") or r.get("open_ou") or 0)
+                            for r in train])
         outdoor = arr("is_outdoor")
         sp_cum  = arr("home_sp_fip", REPLACEMENT_FIP) + arr("away_sp_fip", REPLACEMENT_FIP)
         sp_l3   = arr("home_l3_fip", REPLACEMENT_FIP) + arr("away_l3_fip", REPLACEMENT_FIP)
@@ -171,7 +189,9 @@ def main():
         def harr(col, fallback=0.0):
             return np.array([float(r[col]) if r.get(col, "") not in ("", None) else fallback
                              for r in holdout])
-        h_acts    = harr("total_runs");  h_mkt = harr("open_ou")
+        h_acts    = harr("total_runs")
+        h_mkt     = np.array([float(r.get("close_ou") or r.get("open_ou") or 0)
+                              for r in holdout])
         h_sp_e    = (harr("home_sp_fip", REPLACEMENT_FIP) + harr("away_sp_fip", REPLACEMENT_FIP)) * (1-fip_blend) + \
                     (harr("home_l3_fip", REPLACEMENT_FIP) + harr("away_l3_fip", REPLACEMENT_FIP)) * fip_blend
         h_bp_e    = harr("home_bp_era") + harr("away_bp_era")
