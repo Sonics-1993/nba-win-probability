@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 4: add ERA-FIP divergence for last 3 starts.
-# When ERA > FIP, pitcher has been allowing runs beyond peripherals → games tend to score more.
-# Positive weight (+0.10) is train-optimal (sweep showed 0.10 best on train, 0.08 best on holdout).
+# Experiment 5: asymmetric starter weighting — ace (lower FIP) gets 1.2× weight, weak starter 0.8×.
+# Hypothesis: the better pitcher dominates game total more than the weaker pitcher.
+# alpha=0.8 → (0.8 * max_fip + 1.2 * min_fip) * sp_weight. Train-optimal from sweep.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -41,7 +41,9 @@ def predict(row: dict) -> float:
     away_sp = fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fip_blend) + \
               fb("away_l3_fip", REPLACEMENT_FIP) * fip_blend
 
-    sp_runs  = (home_sp + away_sp)                                           * sp_weight
+    sp_better = min(home_sp, away_sp)   # lower FIP = ace
+    sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
+    sp_runs   = (0.8 * sp_worse + 1.2 * sp_better)                          * sp_weight
     bp_runs  = (f("home_bp_era") + f("away_bp_era"))                        * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
