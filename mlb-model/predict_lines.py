@@ -354,18 +354,19 @@ def _median(vals: list) -> float:
     return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
 
 
-def predict_run_diff(home, away, srs, rest_map, roll10, park_factors, mp) -> float:
-    srs_diff   = srs.get(home, 0.0) - srs.get(away, 0.0)
-    rest_diff  = rest_map.get(home, 3) - rest_map.get(away, 3)
-    r10_diff   = roll10.get(home, 0.0) - roll10.get(away, 0.0)
-    pf         = park_factors.get(home, 1.0)
-    # park_adj mirrors build_training_dataset.py — park factor re-centered on league avg
-    park_adj   = (pf - 1.0) * 2.0  # approx from training (park_weight=0 in model, but include for completeness)
+def predict_run_diff(home, away, srs, rest_map, roll10, park_factors, mp,
+                     home_fip: float = REPLACEMENT_FIP,
+                     away_fip: float = REPLACEMENT_FIP) -> float:
+    srs_diff    = srs.get(home, 0.0) - srs.get(away, 0.0)
+    rest_diff   = rest_map.get(home, 3) - rest_map.get(away, 3)
+    r10_diff    = roll10.get(home, 0.0) - roll10.get(away, 0.0)
+    sp_fip_diff = away_fip - home_fip   # positive = home starter better
     return (
-        mp.srs_weight    * srs_diff
-        + mp.era_weight  * 0.0
-        + mp.rest_weight * rest_diff
-        + getattr(mp, "roll10_weight", 0.0) * r10_diff
+        mp.srs_weight                          * srs_diff
+        + mp.era_weight                        * 0.0
+        + mp.rest_weight                       * rest_diff
+        + getattr(mp, "roll10_weight",     0.0) * r10_diff
+        + getattr(mp, "sp_fip_diff_weight", 0.0) * sp_fip_diff
         + mp.hca
         + mp.intercept
     )
@@ -483,7 +484,8 @@ def main():
             pred_total = exp.predict(row)
 
             # Run differential prediction
-            mu_diff = predict_run_diff(home, away, srs, rest_map, roll10, pf, mp)
+            mu_diff = predict_run_diff(home, away, srs, rest_map, roll10, pf, mp,
+                                       home_fip=hp["cum_fip"], away_fip=ap["cum_fip"])
 
             # Probabilities
             p_home_ml, p_away_ml   = run_diff_to_ml(mu_diff)

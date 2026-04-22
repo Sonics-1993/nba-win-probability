@@ -87,6 +87,8 @@ def main():
     srs_map  = {(r["date"], r["team"]): float(r[srs_col]) for r in load_csv(srs_file)}
     era_map  = ({(int(r["game_pk"]), r["side"]): float(r["cum_era"])
                  for r in load_csv(era_file)} if era_file.exists() else {})
+    fip_map  = ({(int(r["game_pk"]), r["side"]): float(r["cum_fip"])
+                 for r in load_csv(era_file)} if era_file.exists() else {})
 
     park_factors: dict[str, float] = {}
     pf_file = CACHE / "park_factors.json"
@@ -127,6 +129,10 @@ def main():
             "away_era":     round(era_map.get((pk, "away"), REPLACEMENT_ERA), 3),
             "era_diff":     round(era_map.get((pk, "away"), REPLACEMENT_ERA)
                                   - era_map.get((pk, "home"), REPLACEMENT_ERA), 3),
+            "home_sp_fip":  round(fip_map.get((pk, "home"), REPLACEMENT_ERA), 3),
+            "away_sp_fip":  round(fip_map.get((pk, "away"), REPLACEMENT_ERA), 3),
+            "sp_fip_diff":  round(fip_map.get((pk, "away"), REPLACEMENT_ERA)
+                                  - fip_map.get((pk, "home"), REPLACEMENT_ERA), 3),
             "home_rest":    rest_map.get((date, home), 3),
             "away_rest":    rest_map.get((date, away), 3),
             "rest_diff":    rest_map.get((date, home), 3) - rest_map.get((date, away), 3),
@@ -145,6 +151,7 @@ def main():
     out = CACHE / f"training_data_{s}.csv"
     fields = ["date","game_pk","home","away","home_runs","away_runs","run_diff","home_win",
               "home_srs","away_srs","srs_diff","home_era","away_era","era_diff",
+              "home_sp_fip","away_sp_fip","sp_fip_diff",
               "home_rest","away_rest","rest_diff","park_factor","park_adj","roll10_diff",
               "temp_f","wind_mph","tailwind_mph","is_outdoor",
               "open_rl","close_rl","venue"]
