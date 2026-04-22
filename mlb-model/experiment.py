@@ -2,10 +2,10 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 14: SP weight fine-tune — try sp_weight = 0.50 (was 0.45).
-# Hypothesis: starter quality is slightly under-weighted; increasing contribution
-# may improve predictions when ace matchup is dominant.
-# Test: sp_weight = 0.50 (was 0.45).
+# Experiment 11: switch market anchor from open_ou to close_ou.
+# close_ou is available pre-game and is sharper (sharp money has corrected it).
+# Monotonic improvement on both splits: train -0.0117, holdout -0.0153.
+# close_ou fallback to open_ou if unavailable.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
-sp_weight      = 0.50   # starter FIP contribution — EXPERIMENT 14: try 0.50 (was 0.45)
+sp_weight      = 0.45   # starter FIP contribution
 bp_weight      = 0.35   # bullpen ERA contribution
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
