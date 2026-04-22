@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 26: Starter quality gap — add abs(home_sp_fip - away_sp_fip) * gap_weight.
-# Hypothesis: when one ace dominates (large FIP gap), totals compress further beyond
-# what the symmetric sp_weight captures. Try gap_weight = -0.05 (negative = lower total).
+# Experiment 27: SP FIP gap weight — try gap_weight = -0.10 (was -0.05).
+# Hypothesis: gap signal still has room to grow; double the penalty to find peak.
+# The ace dominance compression effect may be stronger than -0.05 captures.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
-gap_weight     = -0.05  # EXPERIMENT 26: abs SP FIP gap — ace dominance compresses totals
+gap_weight     = -0.10  # EXPERIMENT 27: abs SP FIP gap — try -0.10 (was -0.05)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
