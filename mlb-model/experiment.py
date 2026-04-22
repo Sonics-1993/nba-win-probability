@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Hypothesis: OPS (rolling team OPS) is adding noise rather than signal.
-# Ablation showed removing ops_weight improves both train (-0.008) and holdout (-0.003).
-# OPS is likely collinear with roll10 offense runs — the runs feature already captures output.
+# Experiment 2: remove SRS (srs_weight=0).
+# Ablation showed removing SRS improves train (-0.007) and holdout (-0.005).
+# SRS captures run differential vs schedule — likely redundant with roll10 runs scored.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -17,7 +17,7 @@ park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # temperature effect (outdoor only) — confirmed dead signal
 wind_weight    = 0.00   # tailwind mph (outdoor only) — confirmed dead signal
 offense_weight = 0.15   # rolling 10-game runs scored (both teams)
-srs_weight     = 0.15   # simple rating system (combined)
+srs_weight     = 0.00   # EXPERIMENT 2: ablated — redundant with roll10, hurts both splits
 ops_weight     = 0.0    # EXPERIMENT 1: ablated — collinear with roll10, hurts both train and holdout
 fatigue_weight = -0.05  # bullpen 3-day IP fatigue (negative = regression signal)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
