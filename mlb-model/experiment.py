@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 48: offense_weight fine-tune to 0.18 (was 0.15).
-# Hypothesis: rolling 10-game offense may be slightly underweighted. A modest increase
-# may improve predictions for hot/cold offenses without overfitting.
+# Experiment 51: gap_weight fine-tune to -0.12 (was -0.10).
+# Hypothesis: a larger penalty for starter FIP gaps may better capture asymmetric
+# matchups — when one ace dominates the weaker starter, the total drops more.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
-gap_weight     = -0.10  # EXPERIMENT 27: abs SP FIP gap — try -0.10 (was -0.05)
+gap_weight     = -0.12  # abs SP FIP gap — EXP 51: try -0.12 (was -0.10)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
