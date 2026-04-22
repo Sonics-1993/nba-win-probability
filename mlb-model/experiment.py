@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 166: era_fip_div_w = 0.29 — one step above 0.28 (kept).
-# Hypothesis: 0.28 kept with same train; see if 0.29 improves.
+# Experiment 167: model_blend = 0.28 — one step below 0.29 (kept).
+# Hypothesis: 0.29 kept; program.md cautions floor around 0.28, test it.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -27,7 +27,7 @@ gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 18.0   # EXP 165: park factor quadratic term — try 18.0 (was 17.0)
 intercept          = 0.00
 outdoor_intercept  = 0.4   # EXP 159: try 0.4 (was 0.3) — midpoint between kept 0.3 and reverted 0.5
-model_blend    = 0.29   # EXP 162: try 0.29 (was 0.30) — one step further toward market floor
+model_blend    = 0.28   # EXP 167: try 0.28 (was 0.29) — one step further toward market floor
 
 
 def predict(row: dict) -> float:
