@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 173: fatigue_weight = -0.23 — one step below -0.22 (kept).
-# Hypothesis: -0.22 kept; test one more step below floor.
+# Experiment 174: era_fip_div_w = 0.30 — test ceiling (program.md says ruled out >=0.30, but 0.29 kept).
+# Hypothesis: 0.29 kept with same train; 0.30 is the stated ceiling — confirm it.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -22,7 +22,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.23  # bullpen 3-day IP fatigue — EXP 173: try -0.23 (was -0.22)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.29   # ERA-FIP last-3 divergence — EXP 166: try 0.29 (was 0.28)
+era_fip_div_w  = 0.30   # ERA-FIP last-3 divergence — EXP 174: try 0.30 (was 0.29) — confirm ceiling
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 18.0   # EXP 165: park factor quadratic term — try 18.0 (was 17.0)
 intercept          = 0.00
