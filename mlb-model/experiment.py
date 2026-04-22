@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 169: bp_weight = 0.27 — test floor below 0.28 (kept with good holdout).
-# Hypothesis: 0.28 kept with train same -0.0222 but holdout improved to -0.0093; try 0.27.
+# Experiment 170: outdoor_intercept = 0.5 — re-test in new context (many weights changed since session 5 revert).
+# Hypothesis: 0.4 kept with train -0.0226; try 0.5 which was reverted at different weights in session 5.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.29   # ERA-FIP last-3 divergence — EXP 166: try 0.29 (was 0
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 18.0   # EXP 165: park factor quadratic term — try 18.0 (was 17.0)
 intercept          = 0.00
-outdoor_intercept  = 0.4   # EXP 159: try 0.4 (was 0.3) — midpoint between kept 0.3 and reverted 0.5
+outdoor_intercept  = 0.5   # EXP 170: try 0.5 (was 0.4) — re-test in new context with changed park/bp weights
 model_blend    = 0.28   # EXP 167: try 0.28 (was 0.29) — one step further toward market floor
 
 
