@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 116: bp_weight restored to 0.33 and era_fip_div_w = 0.26 (was 0.25).
-# Hypothesis: bp_weight=0.33 is optimum; era_fip_div_w=0.26 reverted pre-park2 but direction untested in new context.
+# Experiment 121: park_weight = 1.8 (was 2.0).
+# Hypothesis: with park2=10.0 handling extremes, linear park_weight may be redundant. Try reducing to 1.8.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.33   # bullpen ERA contribution — EXP 116: restore 0.33 (optimum)
-park_weight    = 2.0    # park factor deviation
+park_weight    = 1.8    # park factor deviation — EXP 121: try 1.8 (was 2.0), park2 handles extremes
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
