@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 19: ERA-FIP divergence weight — try era_fip_div_w = 0.15 (was 0.10).
-# Hypothesis: when a pitcher's last-3 ERA significantly exceeds FIP (lucky) or
-# vice versa, the signal may be stronger than currently weighted. Try 0.15.
+# Experiment 20: ERA-FIP divergence weight — try era_fip_div_w = 0.20 (was 0.15).
+# Hypothesis: divergence improved at 0.15; test if the trend continues at 0.20.
+# ERA-FIP gap may encode pitcher luck/sequencing information the market under-prices.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -23,7 +23,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.07  # bullpen 3-day IP fatigue
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.15   # ERA-FIP last-3 divergence — EXPERIMENT 19: try 0.15 (was 0.10)
+era_fip_div_w  = 0.20   # ERA-FIP last-3 divergence — EXPERIMENT 20: try 0.20 (was 0.15)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
