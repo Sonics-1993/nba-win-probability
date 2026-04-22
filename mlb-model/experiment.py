@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 153: bp_weight = 0.31 — continue downward from 0.32.
-# Hypothesis: 0.32 kept; try 0.31 to find the floor.
+# Experiment 154: bp_weight = 0.30 — continue downward from 0.31.
+# Hypothesis: 0.31 kept with best train -0.0219; try 0.30 to find floor.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -13,7 +13,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
-bp_weight      = 0.31   # bullpen ERA contribution — EXP 153: try 0.31 (was 0.32)
+bp_weight      = 0.30   # bullpen ERA contribution — EXP 154: try 0.30 (was 0.31)
 park_weight    = -1.8   # park factor deviation — EXP 138: try -1.8 (was -1.5)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
