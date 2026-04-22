@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 30: Ace asymmetry ratio — try 1.5×ace / 0.5×weaker (was 1.4×/0.6×).
-# Hypothesis: stronger ace weighting may compress totals more effectively when
-# one pitcher clearly dominates. The gap_weight captures gap size; this captures directionality.
+# Experiment 42: fatigue_weight rollback to -0.10 (was -0.12).
+# Hypothesis: current -0.12 was escalated to improve train but may be overfit.
+# A milder penalty may generalize better to holdout while preserving most train gain.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -21,7 +21,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.15   # rolling 10-game runs scored (both teams)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
+fatigue_weight = -0.10  # bullpen 3-day IP fatigue — EXP 42: rollback to -0.10 (was -0.12)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.10  # EXPERIMENT 27: abs SP FIP gap — try -0.10 (was -0.05)
