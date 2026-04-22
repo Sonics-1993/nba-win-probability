@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 74: fatigue_weight to -0.14 (was -0.13 after EXP 73 kept).
-# Hypothesis: -0.13 improved both splits; test if -0.14 continues improving.
+# Experiment 80: offense_weight = 0.17 (was 0.18).
+# Hypothesis: narrow the optimum around 0.18; slight pullback may reduce noise.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -17,7 +17,7 @@ bp_weight      = 0.35   # bullpen ERA contribution
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
-offense_weight = 0.18   # rolling 10-game runs scored (both teams) — EXP 48: try 0.18 (was 0.15)
+offense_weight = 0.17   # rolling 10-game runs scored (both teams) — EXP 80: try 0.17 (was 0.18)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.14  # bullpen 3-day IP fatigue — EXP 74: try -0.14 (was -0.13)
