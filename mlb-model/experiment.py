@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 139: model_blend = 0.30 — one step further toward market floor.
-# Hypothesis: 0.31 kept; caution — floor likely near 0.30; test with holdout guard.
+# Experiment 140: park2_weight = 11.0 — re-test between 10.0 (kept) and 12.0 (reverted).
+# Hypothesis: optimum may sit at 11.0; previously 12.0 reverted in different context.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.19  # bullpen 3-day IP fatigue — EXP 105: try -0.19 (was -
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0.25) in new park2 context
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
+park2_weight   = 11.0   # EXP 140: park factor quadratic term — try 11.0 (was 10.0)
 intercept          = 0.00
 outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
 model_blend    = 0.30   # EXP 139: try 0.30 (was 0.31) — one step further toward market floor
