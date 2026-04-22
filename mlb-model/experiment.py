@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 71: ace asymmetry 1.8×ace / 0.2×weaker (was 1.7/0.3 after EXP 70 kept).
-# Hypothesis: 1.7× improved train; holdout diverging — test 1.8× to find peak before overfit.
+# Experiment 70: ace asymmetry 1.7×ace / 0.3×weaker (was 1.6/0.4 after EXP 69 kept).
+# Hypothesis: 1.6×ace improved train; test 1.7× to find plateau.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -46,7 +46,7 @@ def predict(row: dict) -> float:
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
-    sp_runs   = (0.2 * sp_worse + 1.8 * sp_better)                          * sp_weight  # EXP 71: 1.8×ace
+    sp_runs   = (0.3 * sp_worse + 1.7 * sp_better)                          * sp_weight  # EXP 70: 1.7×ace
     bp_runs  = (min(f("home_bp_era"), BP_ERA_CAP) + min(f("away_bp_era"), BP_ERA_CAP)) * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
