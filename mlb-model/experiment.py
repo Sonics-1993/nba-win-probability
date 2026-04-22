@@ -2,8 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 70: ace asymmetry 1.7×ace / 0.3×weaker (was 1.6/0.4 after EXP 69 kept).
-# Hypothesis: 1.6×ace improved train; test 1.7× to find plateau.
+# Experiment 73: fatigue_weight to -0.13 (was -0.12) with new context.
+# Hypothesis: with new gap_weight=-0.35 and ace=1.7×, the model structure has changed —
+# re-test fatigue sensitivity to see if the optimum shifted.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -20,7 +21,7 @@ wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.18   # rolling 10-game runs scored (both teams) — EXP 48: try 0.18 (was 0.15)
 srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
-fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
+fatigue_weight = -0.13  # bullpen 3-day IP fatigue — EXP 73: try -0.13 (was -0.12)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
