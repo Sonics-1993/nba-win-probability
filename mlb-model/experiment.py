@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 159: outdoor_intercept = 0.4 — midpoint between 0.3 (kept) and 0.5 (reverted).
-# Hypothesis: 0.3 kept, 0.5 reverted in session 5; 0.4 untested.
+# Experiment 160: era_fip_div_w = 0.28 — one step above 0.27 (kept borderline).
+# Hypothesis: 0.27 kept; continue to see if signal has more room.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -22,7 +22,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.20  # bullpen 3-day IP fatigue — EXP 149: try -0.20 (was -0.19)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.27   # ERA-FIP last-3 divergence — EXP 148: try 0.27 (was 0.26)
+era_fip_div_w  = 0.28   # ERA-FIP last-3 divergence — EXP 160: try 0.28 (was 0.27)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 17.0   # EXP 158: park factor quadratic term — try 17.0 (was 16.0)
 intercept          = 0.00
