@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 143: park2_weight = 14.0 — push quadratic park term higher.
-# Hypothesis: 13.0 kept with new best holdout -0.0128; direction still active, try 14.0.
+# Experiment 144: park2_weight = 15.0 — push quadratic park term higher.
+# Hypothesis: 14.0 kept with holdout -0.0130; train slipping to -0.0214; try 15.0 cautiously.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.19  # bullpen 3-day IP fatigue — EXP 105: try -0.19 (was -
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0.25) in new park2 context
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 14.0   # EXP 143: park factor quadratic term — try 14.0 (was 13.0)
+park2_weight   = 15.0   # EXP 144: park factor quadratic term — try 15.0 (was 14.0)
 intercept          = 0.00
 outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
 model_blend    = 0.30   # EXP 139: try 0.30 (was 0.31) — one step further toward market floor
