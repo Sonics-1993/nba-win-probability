@@ -2,10 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 15: SP weight fine-tune — try sp_weight = 0.40 (was 0.45).
-# Hypothesis: starter quality may be slightly over-weighted; the FIP signal
-# is already captured in the market line. Reduce to 0.40 and see if raw
-# model quality improves when blended back with close_ou.
+# Experiment 19: ERA-FIP divergence weight — try era_fip_div_w = 0.15 (was 0.10).
+# Hypothesis: when a pitcher's last-3 ERA significantly exceeds FIP (lucky) or
+# vice versa, the signal may be stronger than currently weighted. Try 0.15.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +23,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.07  # bullpen 3-day IP fatigue
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.10   # ERA-FIP last-3 divergence
+era_fip_div_w  = 0.15   # ERA-FIP last-3 divergence — EXPERIMENT 19: try 0.15 (was 0.10)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
