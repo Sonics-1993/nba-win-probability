@@ -2,10 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 40: era_fip_div_w rollback to 0.20 (was 0.25).
-# Hypothesis: the divergence signal was pushed to 0.25 which improved train but
-# hurt generalization (holdout worsened from -0.0153 to -0.0081). Pulling back to
-# 0.20 may recover holdout generalization while sacrificing only a little train gain.
+# Experiment 30: Ace asymmetry ratio — try 1.5×ace / 0.5×weaker (was 1.4×/0.6×).
+# Hypothesis: stronger ace weighting may compress totals more effectively when
+# one pitcher clearly dominates. The gap_weight captures gap size; this captures directionality.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +23,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.20   # ERA-FIP last-3 divergence — EXP 40: rollback to 0.20 (was 0.25)
+era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.10  # EXPERIMENT 27: abs SP FIP gap — try -0.10 (was -0.05)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
