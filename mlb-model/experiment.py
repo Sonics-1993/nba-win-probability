@@ -2,9 +2,7 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 8: cap bullpen ERA at 6.0 — BP ERA p90=5.93, >6.0 affects 273 team-games.
-# High BP ERA early in season is noisy; capping reduces overweighting bad early bullpens.
-# train improves +0.0016, holdout roughly neutral.
+# Experiment 9: final joint re-opt with all caps — alpha=0.6 (ace 1.4x), sp↓, bp↑, park↓.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -13,9 +11,9 @@ BP_ERA_CAP = 6.0  # bullpen ERA cap — p90=5.93
 
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
-sp_weight      = 0.48   # starter FIP contribution (up slightly)
-bp_weight      = 0.32   # bullpen ERA contribution (down slightly)
-park_weight    = 2.5    # park factor deviation
+sp_weight      = 0.45   # starter FIP contribution
+bp_weight      = 0.35   # bullpen ERA contribution
+park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.15   # rolling 10-game runs scored (both teams)
@@ -45,7 +43,7 @@ def predict(row: dict) -> float:
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
-    sp_runs   = (0.7 * sp_worse + 1.3 * sp_better)                          * sp_weight
+    sp_runs   = (0.6 * sp_worse + 1.4 * sp_better)                          * sp_weight
     bp_runs  = (min(f("home_bp_era"), BP_ERA_CAP) + min(f("away_bp_era"), BP_ERA_CAP)) * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
