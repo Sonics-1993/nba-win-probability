@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 25: Fatigue weight fine-tune — try fatigue_weight = -0.12 (was -0.10).
-# Hypothesis: fatigue signal still improving at -0.10; push further to find plateau.
-# Holdout divergence a concern; if train doesn't clearly improve, stop here.
+# Experiment 26: Starter quality gap — add abs(home_sp_fip - away_sp_fip) * gap_weight.
+# Hypothesis: when one ace dominates (large FIP gap), totals compress further beyond
+# what the symmetric sp_weight captures. Try gap_weight = -0.05 (negative = lower total).
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,6 +24,7 @@ ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
+gap_weight     = -0.05  # EXPERIMENT 26: abs SP FIP gap — ace dominance compresses totals
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
@@ -57,8 +58,9 @@ def predict(row: dict) -> float:
     fat_adj  = (f("home_bp_ip_3d") + f("away_bp_ip_3d") - fatigue_center)   * fatigue_weight
     div_adj  = ((fb("home_l3_era", REPLACEMENT_ERA) - fb("home_l3_fip", REPLACEMENT_FIP)) +
                 (fb("away_l3_era", REPLACEMENT_ERA) - fb("away_l3_fip", REPLACEMENT_FIP))) * era_fip_div_w
+    gap_adj  = abs(home_sp - away_sp)                                          * gap_weight
 
     raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
-           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + intercept)
+           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + gap_adj + intercept)
     ou  = fb("close_ou", fb("open_ou", raw))  # closing line (sharper); fallback to open, then model
     return model_blend * raw + (1 - model_blend) * ou
