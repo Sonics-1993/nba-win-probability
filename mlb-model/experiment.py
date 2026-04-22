@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 131: park_weight = -0.6 (was -0.3).
-# Hypothesis: -0.3 kept; push further negative to find ceiling of anti-linear park correction.
+# Experiment 132: outdoor_intercept = 0.3 — add flat outdoor run-environment term.
+# Hypothesis: outdoor games under-predicted by -0.74 runs (vs dome -0.11); add 0.3 intercept.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -25,7 +25,8 @@ fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0.25) in new park2 context
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
-intercept      = 0.00
+intercept          = 0.00
+outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
 model_blend    = 0.31   # EXP 110: try 0.31 (was 0.32) — continue toward market floor
 
 
@@ -59,9 +60,10 @@ def predict(row: dict) -> float:
     fat_adj  = (f("home_bp_ip_3d") + f("away_bp_ip_3d") - fatigue_center)   * fatigue_weight
     div_adj  = ((fb("home_l3_era", REPLACEMENT_ERA) - fb("home_l3_fip", REPLACEMENT_FIP)) +
                 (fb("away_l3_era", REPLACEMENT_ERA) - fb("away_l3_fip", REPLACEMENT_FIP))) * era_fip_div_w
-    gap_adj  = abs(home_sp - away_sp)                                          * gap_weight
+    gap_adj     = abs(home_sp - away_sp)                                       * gap_weight
+    outdoor_adj = outdoor_intercept if outdoor else 0.0
 
     raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
-           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + gap_adj + intercept)
+           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + gap_adj + outdoor_adj + intercept)
     ou  = fb("close_ou", fb("open_ou", raw))  # closing line (sharper); fallback to open, then model
     return model_blend * raw + (1 - model_blend) * ou
