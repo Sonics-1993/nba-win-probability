@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 58: gap_weight to -0.40 (was -0.35 after EXP 57 kept).
-# Hypothesis: holdout diverging; test -0.40 — may be last profitable step before overfit.
+# Experiment 57: gap_weight to -0.35 (was -0.30 after EXP 56 kept).
+# Hypothesis: test if gap_weight can push further; watch holdout for divergence signal.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -23,7 +23,7 @@ ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.12  # bullpen 3-day IP fatigue — EXPERIMENT 25: try -0.12 (was -0.10)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
-gap_weight     = -0.40  # abs SP FIP gap — EXP 58: try -0.40 (was -0.35)
+gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 intercept      = 0.00
 model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
