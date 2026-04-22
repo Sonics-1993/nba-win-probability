@@ -2,10 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 62: model_blend fine-tune to 0.35 (was 0.37 after EXP 61 kept).
-# Hypothesis: 0.37 improved both splits; test 0.35 to see if trend continues or plateaus.
-# Note: 0.35 was previously reverted in an earlier session, but context (gap/offense weights)
-# has changed significantly — worth retesting.
+# Experiment 69: ace asymmetry 1.6×ace / 0.4×weaker (was 1.5/0.5).
+# Hypothesis: with larger gap_weight (-0.35), explicit asymmetry can be stronger —
+# the ace drives runs down more, especially with a wider FIP gap.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -48,7 +47,7 @@ def predict(row: dict) -> float:
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
-    sp_runs   = (0.5 * sp_worse + 1.5 * sp_better)                          * sp_weight  # EXP 30: 1.5×ace
+    sp_runs   = (0.4 * sp_worse + 1.6 * sp_better)                          * sp_weight  # EXP 69: 1.6×ace
     bp_runs  = (min(f("home_bp_era"), BP_ERA_CAP) + min(f("away_bp_era"), BP_ERA_CAP)) * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
