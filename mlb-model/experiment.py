@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 109: model_blend = 0.32 (was 0.33).
-# Hypothesis: 0.33 improved. Push further down the blend toward market to find floor.
+# Experiment 110: model_blend = 0.31 (was 0.32).
+# Hypothesis: 0.32 improved further. Continue toward market blend floor.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept      = 0.00
-model_blend    = 0.32   # EXP 109: try 0.32 (was 0.33) — push further down blend
+model_blend    = 0.31   # EXP 110: try 0.31 (was 0.32) — continue toward market floor
 
 
 def predict(row: dict) -> float:
