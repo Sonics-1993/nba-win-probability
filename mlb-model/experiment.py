@@ -2,10 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 62: model_blend fine-tune to 0.35 (was 0.37 after EXP 61 kept).
-# Hypothesis: 0.37 improved both splits; test 0.35 to see if trend continues or plateaus.
-# Note: 0.35 was previously reverted in an earlier session, but context (gap/offense weights)
-# has changed significantly — worth retesting.
+# Experiment 63: model_blend to 0.33 (was 0.35 after EXP 62 kept).
+# Hypothesis: trend continues improving; test 0.33 for further gains.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -27,7 +25,7 @@ fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 intercept      = 0.00
-model_blend    = 0.35   # EXP 62: try 0.35 (was 0.37)
+model_blend    = 0.33   # EXP 63: try 0.33 (was 0.35)
 
 
 def predict(row: dict) -> float:
