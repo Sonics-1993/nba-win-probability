@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 170: outdoor_intercept = 0.5 — re-test in new context (many weights changed since session 5 revert).
-# Hypothesis: 0.4 kept with train -0.0226; try 0.5 which was reverted at different weights in session 5.
+# Experiment 171: outdoor_intercept = 0.6 — continue trend from 0.5 (best train this session -0.0229).
+# Hypothesis: 0.5 kept with best train -0.0229; see if 0.6 extends the gain.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.29   # ERA-FIP last-3 divergence — EXP 166: try 0.29 (was 0
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 18.0   # EXP 165: park factor quadratic term — try 18.0 (was 17.0)
 intercept          = 0.00
-outdoor_intercept  = 0.5   # EXP 170: try 0.5 (was 0.4) — re-test in new context with changed park/bp weights
+outdoor_intercept  = 0.6   # EXP 171: try 0.6 (was 0.5) — continue trend, best train -0.0229 at 0.5
 model_blend    = 0.28   # EXP 167: try 0.28 (was 0.29) — one step further toward market floor
 
 
