@@ -2,14 +2,13 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 62: model_blend fine-tune to 0.35 (was 0.37 after EXP 61 kept).
-# Hypothesis: 0.37 improved both splits; test 0.35 to see if trend continues or plateaus.
-# Note: 0.35 was previously reverted in an earlier session, but context (gap/offense weights)
-# has changed significantly — worth retesting.
+# Experiment 65: FIP_CAP sensitivity — try 5.0 (was 5.25).
+# Hypothesis: a tighter cap excludes more outlier starters; may improve signal quality
+# especially early-season when sample sizes are small.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
-FIP_CAP    = 5.25  # starter FIP cap — EXPERIMENT 28: try 5.25 (was 5.5)
+FIP_CAP    = 5.0   # starter FIP cap — EXP 65: try 5.0 (was 5.25)
 BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 
 # --- Weights: tune freely ---
