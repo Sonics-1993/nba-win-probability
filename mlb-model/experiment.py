@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 113: bp_weight = 0.32 (was 0.33).
-# Hypothesis: session 3 showed 0.33 < 0.35; fine-tune downward. Try 0.32.
+# Experiment 116: bp_weight restored to 0.33 and era_fip_div_w = 0.26 (was 0.25).
+# Hypothesis: bp_weight=0.33 is optimum; era_fip_div_w=0.26 reverted pre-park2 but direction untested in new context.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -13,7 +13,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
-bp_weight      = 0.32   # bullpen ERA contribution — EXP 113: try 0.32 (was 0.33)
+bp_weight      = 0.33   # bullpen ERA contribution — EXP 116: restore 0.33 (optimum)
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
@@ -22,7 +22,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.19  # bullpen 3-day IP fatigue — EXP 105: try -0.19 (was -0.18)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
+era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0.25) in new park2 context
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept      = 0.00
