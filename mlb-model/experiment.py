@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 114: bp_weight = 0.34 (was 0.32), restoring direction.
-# Hypothesis: 0.32 didn't help; try 0.34 (one step above 0.33 optimum).
+# Experiment 113: bp_weight = 0.32 (was 0.33).
+# Hypothesis: session 3 showed 0.33 < 0.35; fine-tune downward. Try 0.32.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -13,7 +13,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 # --- Weights: tune freely ---
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
-bp_weight      = 0.34   # bullpen ERA contribution — EXP 114: try 0.34 (was 0.32)
+bp_weight      = 0.32   # bullpen ERA contribution — EXP 113: try 0.32 (was 0.33)
 park_weight    = 2.0    # park factor deviation
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
