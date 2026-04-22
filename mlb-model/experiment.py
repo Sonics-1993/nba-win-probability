@@ -2,7 +2,11 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 9: final joint re-opt with all caps — alpha=0.6 (ace 1.4x), sp↓, bp↑, park↓.
+# Experiment 10: blend model with opening market line.
+# Sweep showed 40% model + 60% market beats the market on BOTH splits:
+#   train delta -0.0081, holdout delta -0.0092.
+# Model has complementary signal; market anchors us to well-calibrated public info.
+# blend=0.4 is train-optimal. Fallback: if open_ou missing, use pure model.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -23,6 +27,7 @@ fatigue_weight = -0.07  # bullpen 3-day IP fatigue
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.10   # ERA-FIP last-3 divergence
 intercept      = 0.00
+model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
 
 def predict(row: dict) -> float:
@@ -55,5 +60,7 @@ def predict(row: dict) -> float:
     div_adj  = ((fb("home_l3_era", REPLACEMENT_ERA) - fb("home_l3_fip", REPLACEMENT_FIP)) +
                 (fb("away_l3_era", REPLACEMENT_ERA) - fb("away_l3_fip", REPLACEMENT_FIP))) * era_fip_div_w
 
-    return (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
-            + off_adj + srs_adj + ops_adj + fat_adj + div_adj + intercept)
+    raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
+           + off_adj + srs_adj + ops_adj + fat_adj + div_adj + intercept)
+    ou  = fb("open_ou", raw)   # opening line; fallback to raw model if unavailable
+    return model_blend * raw + (1 - model_blend) * ou
