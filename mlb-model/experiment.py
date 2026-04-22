@@ -2,10 +2,10 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 12: Re-tune model_blend from 0.40 to 0.35.
-# Hypothesis: the market (close_ou) is even more informative than the statistical
-# model, and reducing the model weight to 0.35 may capture more of the market signal.
-# Test: model_blend = 0.35 (was 0.40).
+# Experiment 11: switch market anchor from open_ou to close_ou.
+# close_ou is available pre-game and is sharper (sharp money has corrected it).
+# Monotonic improvement on both splits: train -0.0117, holdout -0.0153.
+# close_ou fallback to open_ou if unavailable.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ fatigue_weight = -0.07  # bullpen 3-day IP fatigue
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.10   # ERA-FIP last-3 divergence
 intercept      = 0.00
-model_blend    = 0.35   # EXPERIMENT 12: try 0.35 (was 0.40) — more market weight
+model_blend    = 0.40   # EXPERIMENT 10: weight on statistical model vs opening O/U line
 
 
 def predict(row: dict) -> float:
