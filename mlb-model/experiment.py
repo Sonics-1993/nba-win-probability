@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 129: park_weight = 0.0 (was 0.4).
-# Hypothesis: 0.4 still improving — try fully ablating linear park; park2 quadratic captures all park signal.
+# Experiment 130: park_weight = -0.3 (was 0.0).
+# Hypothesis: 0.0 kept — test if slight negative linear term (anti-linear correction) helps further.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.33   # bullpen ERA contribution — EXP 116: restore 0.33 (optimum)
-park_weight    = 0.0    # park factor deviation — EXP 129: ablate linear park; park2 carries all
+park_weight    = -0.3   # park factor deviation — EXP 130: try negative linear, anti-correction
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
