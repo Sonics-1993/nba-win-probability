@@ -48,26 +48,30 @@ def predict(row: dict, mp) -> float:
     away_sp = min(fb("away_sp_fip", REPLACEMENT_FIP) * (1 - fb_blend) +
                   fb("away_l3_fip", REPLACEMENT_FIP) * fb_blend, fip_cap)
 
-    # Asymmetric: ace (lower FIP) gets 1.4x weight, weaker starter 0.6x
+    # Asymmetric: ace (lower FIP) gets 1.7x weight, weaker starter 0.3x
     sp_better = min(home_sp, away_sp)
     sp_worse  = max(home_sp, away_sp)
-    sp_runs  = (0.6 * sp_worse + 1.4 * sp_better)               * getattr(mp, "sp_weight",      0.45)
+    pf        = f("park_factor")
+    sp_runs  = (0.3 * sp_worse + 1.7 * sp_better)               * getattr(mp, "sp_weight",         0.42)
     bp_runs  = (min(f("home_bp_era"), bp_cap) +
-                min(f("away_bp_era"), bp_cap))                   * getattr(mp, "bp_weight",      0.35)
-    park_adj = (f("park_factor") - 1.0)                          * getattr(mp, "park_weight",    2.0)
-    temp_adj = ((f("temp_f") - 72.0) * getattr(mp, "temp_weight", 0.0)) if outdoor else 0.0
-    wind_adj = (f("tailwind_mph")     * getattr(mp, "wind_weight", 0.0)) if outdoor else 0.0
-    off_adj  = (f("home_roll10") + f("away_roll10"))              * getattr(mp, "offense_weight", 0.15)
-    srs_adj  = (f("home_srs")    + f("away_srs"))                 * getattr(mp, "srs_weight",     0.0)
+                min(f("away_bp_era"), bp_cap))                   * getattr(mp, "bp_weight",         0.29)
+    park_adj = ((pf - 1.0)      * getattr(mp, "park_weight",       -1.8) +
+                (pf - 1.0) ** 2 * getattr(mp, "park2_weight",      16.0))
+    gap_adj  = abs(home_sp - away_sp)                            * getattr(mp, "gap_weight",        -0.35)
+    temp_adj = ((f("temp_f") - 72.0) * getattr(mp, "temp_weight",  0.0)) if outdoor else 0.0
+    wind_adj = (f("tailwind_mph")     * getattr(mp, "wind_weight",  0.0)) if outdoor else 0.0
+    out_adj  = getattr(mp, "outdoor_intercept", 0.0) if outdoor else 0.0
+    off_adj  = (f("home_roll10") + f("away_roll10"))              * getattr(mp, "offense_weight",   0.19)
+    srs_adj  = (f("home_srs")    + f("away_srs"))                 * getattr(mp, "srs_weight",       0.0)
     ops_adj  = (fb("home_ops", 0.720) + fb("away_ops", 0.720) - 1.440) \
-                                                                   * getattr(mp, "ops_weight",     0.0)
+                                                                   * getattr(mp, "ops_weight",       0.0)
     fat_adj  = (f("home_bp_ip_3d") + f("away_bp_ip_3d") - getattr(mp, "fatigue_center", 11.62)) \
-                                                                   * getattr(mp, "fatigue_weight", 0.0)
+                                                                   * getattr(mp, "fatigue_weight",  -0.20)
     div_adj  = ((fb("home_l3_era", REPLACEMENT_ERA) - fb("home_l3_fip", REPLACEMENT_FIP)) +
                 (fb("away_l3_era", REPLACEMENT_ERA) - fb("away_l3_fip", REPLACEMENT_FIP))) \
-                                                                   * getattr(mp, "era_fip_div_w",  0.0)
+                                                                   * getattr(mp, "era_fip_div_w",   0.27)
 
-    raw = (sp_runs + bp_runs + park_adj + temp_adj + wind_adj
+    raw = (sp_runs + bp_runs + park_adj + gap_adj + temp_adj + wind_adj + out_adj
            + off_adj + srs_adj + ops_adj + fat_adj + div_adj + getattr(mp, "intercept", 0.0))
 
     blend = getattr(mp, "model_blend", 1.0)
@@ -94,13 +98,10 @@ def main():
     train   = [r for r in rows if r["date"] < "2025-08"]
     holdout = [r for r in rows if r["date"] >= "2025-08"]
 
-    def _mkt_ou(r):
-        return r.get("close_ou") or r.get("open_ou")
-
     def score(subset, label):
         if not subset: return
         pred_errors   = [abs(predict(r, mp) - r["total_runs"]) for r in subset]
-        market_errors = [abs(_mkt_ou(r) - r["total_runs"]) for r in subset if _mkt_ou(r)]
+        market_errors = [abs(float(r["open_ou"]) - r["total_runs"]) for r in subset if r.get("open_ou")]
         mae  = sum(pred_errors)   / len(pred_errors)
         mmae = sum(market_errors) / len(market_errors)
         print(f"[{label}] N={len(subset)}  Model MAE={mae:.4f}  Market MAE={mmae:.4f}  Delta={mae-mmae:+.4f}")
