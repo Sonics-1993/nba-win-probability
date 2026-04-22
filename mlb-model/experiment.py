@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 99: park2_weight = 8.0 (was 6.0).
-# Hypothesis: 6.0 kept with holdout -0.0105 (best ever); larger step to find where train divergence hurts.
+# Experiment 100: park2_weight = 10.0 (was 8.0).
+# Hypothesis: 8.0 kept with holdout -0.0110 (new record); holdout keeps climbing, train stable. Push to 10.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -24,7 +24,7 @@ fatigue_weight = -0.16  # bullpen 3-day IP fatigue — EXP 83: try -0.16 (was -0
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
 era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
-park2_weight   = 8.0    # EXP 99: park factor quadratic term — try 8.0 (was 6.0)
+park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept      = 0.00
 model_blend    = 0.34   # EXP 90: try 0.34 (was 0.35)
 
