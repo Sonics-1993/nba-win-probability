@@ -7,33 +7,31 @@ You are an autonomous research agent improving the MLB run-totals prediction mod
 
 ## Goal
 
-Minimize `train_delta`. Keep if train_delta improves (lower than −0.0222).
+Minimize `train_delta`. Keep if train_delta improves (lower than −0.0231).
 Apply holdout guard: revert if holdout worsens >0.005 with only marginal train gain (<0.0003).
 
-**Current state (end of session 5, run 155):**
-- TRAIN   N=1602  Delta=**−0.0222**
+**Current state (end of session 6, run 176):**
+- TRAIN   N=1602  Delta=**−0.0231**
 - HOLDOUT N= 781  Delta=**−0.0104**
 
-WARNING: Train/holdout divergence is emerging. bp_weight reduction (0.33→0.29) improved
-train strongly but hurt holdout from −0.0135 (run 145) to −0.0104 (run 155). The best
-holdout this session was −0.0135 at park2_weight=16.0 / bp_weight=0.33. Prioritize
-experiments that recover holdout without sacrificing train gains.
+Holdout recovered from the session-5 divergence. Zero reverts in session 6 — model is
+in a stable improvement region.
 
 ---
 
 ## Current weights (experiment.py)
 
 ```
-sp_weight        = 0.42   bp_weight        = 0.29   park_weight      = -1.8
-park2_weight     = 16.0   offense_weight   = 0.19   fatigue_weight   = -0.20
-era_fip_div_w    = 0.27   gap_weight       = -0.35  model_blend      = 0.30
+sp_weight        = 0.42   bp_weight        = 0.27   park_weight      = -3.0
+park2_weight     = 18.0   offense_weight   = 0.19   fatigue_weight   = -0.23
+era_fip_div_w    = 0.30   gap_weight       = -0.35  model_blend      = 0.28
 FIP_CAP          = 5.25   BP_ERA_CAP       = 5.75   fatigue_center   = 11.62
 ace asymmetry    = 1.7×ace / 0.3×weaker             intercept        = 0.00
-outdoor_intercept = 0.3   (ADDED session 5)
+outdoor_intercept = 0.7
 ```
 
 park formula: `park_adj = (pf - 1.0) * park_weight + (pf - 1.0)**2 * park2_weight`
-`outdoor_adj = outdoor_intercept if outdoor else 0.0` is now included in raw.
+`outdoor_adj = outdoor_intercept if outdoor else 0.0`
 
 ---
 
@@ -60,33 +58,33 @@ park formula: `park_adj = (pf - 1.0) * park_weight + (pf - 1.0)**2 * park2_weigh
 
 ---
 
-## Ideas to Try (session 6)
+## Ideas to Try (session 7)
 
-**PRIORITY 1 — Resolve bp_weight train/holdout tension**
-bp_weight swept 0.33→0.29, each step improving train but hurting holdout. The sweet spot
-may be around 0.31 (held well) or 0.30 (holdout was still ok). Try:
-- `bp_weight = 0.31`: was kept in session 5 (holdout −0.0123). Re-test is NOT needed — already in results.
-  Instead, think of this as: session 5 kept 0.30 then 0.29 — try `bp_weight = 0.28` to see if
-  train continues improving, or the ceiling is 0.29.
-- Actually, consider reverting `bp_weight` to 0.31 or 0.30 to check holdout recovery — but
-  this would sacrifice train. Instead: test other dimensions first, then revisit bp_weight with
-  a joint scan against park2_weight.
+**PRIORITY 1 — Revert to cleaner optima (session 6 overshot on several)**
+Session 6 kept every experiment even when the improvement was marginal or holdout
+declined slightly. Several weights drifted past their true optimum:
+- `outdoor_intercept = 0.6`: 0.7 tied train with 0.6 but holdout was slightly worse.
+  Try reverting to 0.6 — if train holds at -0.0231, it's a cleaner config.
+  (This is the one most likely to be worth reverting.)
+- `park_weight = -2.4`: was peak train (-0.0227 at the time); -3.0 matched it later
+  with worse holdout. Consider testing -2.4 to see if cleaner.
+- `model_blend = 0.29`: 0.28 regressed train slightly and holdout was same.
+  Reverting would need train to match -0.0231 — check before committing.
 
-**PRIORITY 2 — Park weight / park2 joint area**
-- `park_weight = -2.1`: continue trend (−1.8 kept; holdout guard applies)
-- `park2_weight = 17.0`: was reverted in session 5 (train hurt). Re-test now with park_weight=−1.8
-  (different context from when 17.0 was first tried at park_weight=−0.6).
+**PRIORITY 2 — Continue active trends**
+- `outdoor_intercept = 0.8`: if 0.7 is confirmed best, one more step to check ceiling
+- `park2_weight = 19.0`: still moving at 18.0 (16→17→18 all kept); try one more
+- `bp_weight = 0.26`: 0.27 kept; one more step (floor still unclear)
+- `park_weight = -3.3`: -3.0 kept; one more step
 
-**PRIORITY 3 — Fine-tunes**
-- `outdoor_intercept = 0.4`: 0.3 kept, 0.5 reverted. Midpoint not yet tested.
-- `era_fip_div_w = 0.28`: 0.27 kept borderline; continue.
-- `fatigue_weight = -0.21`: −0.20 kept; one more step (floor ~−0.22 per program).
-- `model_blend = 0.29`: 0.30 kept; one more step (caution — may be floor).
-- `sp_weight = 0.43`: consistently reverted in sessions 3 and 5. Do NOT re-test.
+**PRIORITY 3 — Fine-tunes not yet exhausted**
+- `fatigue_weight = -0.24`: -0.23 kept; -0.22 was also kept; trend still active
+- `era_fip_div_w = 0.31`: 0.30 kept; one more step
+- `sp_weight = 0.41`: sp has been at 0.42 since session 2; test slightly lower in new context
 
-**PRIORITY 4 — Joint scans (after individual wins stabilize)**
-- `bp_weight × park2_weight`: bp divergence may interact with park2 scaling.
-- `fatigue_weight × era_fip_div_w`.
+**PRIORITY 4 — Joint scan (after individual wins stabilize)**
+- `outdoor_intercept × park_weight`: both affect outdoor/park run environment;
+  joint optimum likely exists
 
 ---
 
@@ -94,20 +92,18 @@ may be around 0.31 (held well) or 0.30 (holdout was still ok). Try:
 
 - OPS, SRS, fip_blend>0, cumulative ERA-FIP divergence, separate home/away weights
 - Line movement, weather (temp/wind), ERA instead of FIP, per-team intercepts
-- model_blend ≥ 0.35 or ≤ 0.28 (caution below 0.29; test one step at a time)
+- model_blend ≥ 0.35 or ≤ 0.27 (test 0.26 cautiously at most)
 - sp_weight 0.43+ (reverted sessions 3 and 5), sp_weight ≤ 0.40
-- bp_weight 0.35, 0.37, 0.40, 0.30 (kept session 5), 0.31 (kept), 0.32 (kept), 0.33 (prev optimum)
-- park_weight between −1.5 and 0.4 (already swept; holdout peaked at 0.4 in session 4)
-- park2_weight 17.0 (reverted session 5 — re-test only with new park_weight context as noted above)
-- park2_weight 8.0, 12.0 (prev reverts)
-- era_fip_div_w ≤ 0.05 or ≥ 0.30
-- gap_weight beyond −0.35 or less aggressive than −0.35
+- bp_weight 0.30+ (0.30 was kept session 5 but clearly not optimum now)
+- park_weight between -2.7 and 0.4 (swept monotonically)
+- park2_weight ≤ 15.0
+- era_fip_div_w ≤ 0.25 or ≥ 0.32
+- gap_weight beyond -0.35 or less aggressive
 - ace asymmetry beyond 1.7× or below 1.5×
-- offense_weight 0.17, 0.20 (0.19 is optimum)
-- fatigue_weight above −0.16 or below −0.22
-- FIP_CAP 5.0, 5.5+; BP_ERA_CAP 5.5, 6.0
-- outdoor_intercept 0.5+ (reverted session 5); 0.4 not yet tested
-- Global intercept
+- offense_weight ≠ 0.19
+- fatigue_weight above -0.19 or below -0.25
+- FIP_CAP ≠ 5.25; BP_ERA_CAP ≠ 5.75
+- Global intercept (median residual ≈ 0)
 
 ---
 

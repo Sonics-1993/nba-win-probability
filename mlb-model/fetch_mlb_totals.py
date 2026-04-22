@@ -80,9 +80,11 @@ def extract_total(game: dict) -> float | None:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--season",  type=int, default=2025)
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--force",   action="store_true")
+    parser.add_argument("--season",    type=int, default=2025)
+    parser.add_argument("--dry-run",   action="store_true")
+    parser.add_argument("--force",     action="store_true")
+    parser.add_argument("--open-only", action="store_true",
+                        help="Fetch opening snapshot only (saves ~half the credits)")
     args = parser.parse_args()
     s = args.season
 
@@ -105,12 +107,14 @@ def main():
     snap_dir = BASE / "cache" / f"totals_{s}"
     snap_dir.mkdir(parents=True, exist_ok=True)
 
-    to_fetch = [(d, snap) for d in all_dates for snap in ("opening", "closing")
+    snaps = ("opening",) if args.open_only else ("opening", "closing")
+    total_slots = len(all_dates) * len(snaps)
+    to_fetch = [(d, snap) for d in all_dates for snap in snaps
                 if args.force or not (snap_dir / f"snapshot_{d}_{snap}.json").exists()]
 
-    print(f"MLB {s} Totals Odds Fetcher")
+    print(f"MLB {s} Totals Odds Fetcher{'  [opening only]' if args.open_only else ''}")
     print(f"  Dates: {all_dates[0]} → {all_dates[-1]}  ({len(all_dates)} days)")
-    print(f"  To fetch: {len(to_fetch)}  (cached: {len(all_dates)*2 - len(to_fetch)})")
+    print(f"  To fetch: {len(to_fetch)}  (cached: {total_slots - len(to_fetch)})")
     print(f"  Est. credits: ~{len(to_fetch) * 10}")
 
     # Check balance
