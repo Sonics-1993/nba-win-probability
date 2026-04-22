@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 133: outdoor_intercept = 0.5 — push outdoor term up from 0.3.
-# Hypothesis: 0.3 kept with strong train+holdout; outdoor bias was -0.74 so 0.5 may close more gap.
+# Experiment 132: outdoor_intercept = 0.3 — add flat outdoor run-environment term.
+# Hypothesis: outdoor games under-predicted by -0.74 runs (vs dome -0.11); add 0.3 intercept.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -26,7 +26,7 @@ era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept          = 0.00
-outdoor_intercept  = 0.5   # EXP 133: push outdoor term up from 0.3 (outdoor games under-predicted by -0.74)
+outdoor_intercept  = 0.3   # EXP 132: flat outdoor run-environment term (outdoor games under-predicted by -0.74)
 model_blend    = 0.31   # EXP 110: try 0.31 (was 0.32) — continue toward market floor
 
 
