@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 174: era_fip_div_w = 0.30 — test ceiling (program.md says ruled out >=0.30, but 0.29 kept).
-# Hypothesis: 0.29 kept with same train; 0.30 is the stated ceiling — confirm it.
+# Experiment 175: park_weight = -3.0 — continue trend from -2.7 (kept).
+# Hypothesis: -2.4 was peak train at -0.0227; -2.7 kept but slipped. Test -3.0 to confirm ceiling.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -14,7 +14,7 @@ BP_ERA_CAP = 5.75  # bullpen ERA cap — EXPERIMENT 29: try 5.75 (was 6.0)
 fip_blend      = 0.0    # pure cumulative FIP
 sp_weight      = 0.42   # starter FIP contribution — EXP 86: try 0.42 (was 0.41)
 bp_weight      = 0.27   # bullpen ERA contribution — EXP 169: try 0.27 (was 0.28)
-park_weight    = -2.7   # park factor deviation — EXP 168: try -2.7 (was -2.4)
+park_weight    = -3.0   # park factor deviation — EXP 175: try -3.0 (was -2.7)
 temp_weight    = 0.00   # confirmed dead signal
 wind_weight    = 0.00   # confirmed dead signal
 offense_weight = 0.19   # rolling 10-game runs scored (both teams) — EXP 81: try 0.19 (was 0.18)
