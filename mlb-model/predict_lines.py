@@ -29,7 +29,10 @@ BASE = Path(__file__).parent
 CACHE = BASE / "cache"
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-SIGMA = 4.585           # empirical std dev of MLB run differential (2025 season)
+SIGMA       = 4.585     # empirical std dev of MLB run differential (2025 season)
+SIGMA_SLOPE = 0.15      # σ ± 0.15 per 1.0 FIP above/below replacement
+SIGMA_MIN   = 3.8
+SIGMA_MAX   = 5.5
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
 REPLACEMENT_BP  = 4.80
@@ -95,6 +98,29 @@ def run_diff_to_rl(mu: float, sigma: float = SIGMA) -> tuple[float, float]:
     return p_home_cover, 1.0 - p_home_cover
 
 
+def game_sigma(home_fip: float, away_fip: float) -> float:
+    """Per-game σ: tighter for ace duels, wider for high-FIP matchups."""
+    avg_fip = (home_fip + away_fip) / 2.0
+    raw = SIGMA + SIGMA_SLOPE * (avg_fip - REPLACEMENT_FIP)
+    return round(max(SIGMA_MIN, min(SIGMA_MAX, raw)), 2)
+
+
+def _local_hour(utc_str: str, tz_name: str) -> int:
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        dt = datetime.fromisoformat(utc_str.replace("Z", "+00:00"))
+        return dt.astimezone(ZoneInfo(tz_name)).hour
+    except Exception:
+        return 19
+
+
+def _tailwind_comp(wind_mph: float, wind_dir: float, cf_bearing: int) -> float:
+    """Wind component blowing out toward CF. Positive = helps offense."""
+    angle = math.radians(wind_dir - (cf_bearing + 180))
+    return round(wind_mph * math.cos(angle), 2)
+
+
 # ── Data loading ──────────────────────────────────────────────────────────────
 def _get(url, params=None):
     r = requests.get(url, params=params, timeout=20)
@@ -121,14 +147,74 @@ def load_park_factors() -> dict[str, float]:
     return json.loads(p.read_text()) if p.exists() else {}
 
 
+def load_stadiums() -> dict:
+    spec = importlib.util.spec_from_file_location("fetch_weather", BASE / "fetch_weather.py")
+    mod  = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.STADIUMS
+
+
+def fetch_forecast_weather(games: list[dict], stadiums: dict) -> dict[int, dict]:
+    """Returns {game_pk: {temp_f, tailwind_mph, is_outdoor}} fetched from Open-Meteo forecast."""
+    venues_needed = {g["venue"]: stadiums[g["venue"]]
+                     for g in games
+                     if g.get("venue") in stadiums and stadiums[g["venue"]][3] == 1}
+
+    wx_by_venue: dict[str, dict] = {}
+    for venue, (lat, lon, tz, _, _) in venues_needed.items():
+        try:
+            r = requests.get("https://api.open-meteo.com/v1/forecast", params={
+                "latitude": lat, "longitude": lon,
+                "hourly": "temperature_2m,wind_speed_10m,wind_direction_10m",
+                "wind_speed_unit": "mph", "temperature_unit": "fahrenheit",
+                "timezone": tz, "forecast_days": 7,
+            }, timeout=15)
+            if r.status_code != 200:
+                continue
+            h = r.json()["hourly"]
+            by_date: dict[str, dict] = {}
+            for i, ts in enumerate(h["time"]):
+                d, hr = ts[:10], int(ts[11:13])
+                by_date.setdefault(d, {})[hr] = {
+                    "temp_f":   round(h["temperature_2m"][i],    1),
+                    "wind_mph": round(h["wind_speed_10m"][i],    1),
+                    "wind_dir": round(h["wind_direction_10m"][i], 1),
+                }
+            wx_by_venue[venue] = by_date
+        except Exception:
+            pass
+
+    result: dict[int, dict] = {}
+    for g in games:
+        pk    = g["game_pk"]
+        venue = g.get("venue", "")
+        if venue not in stadiums:
+            result[pk] = {"temp_f": 72.0, "tailwind_mph": 0.0,
+                          "is_outdoor": 0 if g["home"] in DOME_PARKS else 1}
+            continue
+        _, _, tz, is_outdoor, bearing = stadiums[venue]
+        if not is_outdoor:
+            result[pk] = {"temp_f": 72.0, "tailwind_mph": 0.0, "is_outdoor": 0}
+            continue
+        local_hr = _local_hour(g.get("game_time", ""), tz)
+        day_wx   = wx_by_venue.get(venue, {}).get(g.get("date", ""), {})
+        wx       = day_wx.get(local_hr) or day_wx.get(19) or {}
+        if not wx:
+            result[pk] = {"temp_f": 72.0, "tailwind_mph": 0.0, "is_outdoor": 1}
+            continue
+        tailwind = _tailwind_comp(wx["wind_mph"], wx["wind_dir"], bearing)
+        result[pk] = {"temp_f": wx["temp_f"], "tailwind_mph": tailwind, "is_outdoor": 1}
+    return result
+
+
 def load_srs(season: int) -> dict[str, float]:
-    """Load latest power ratings (pure regular-season SRS) for the given season.
-    Prefers cum_srs (no preseason contamination) over blended_srs."""
-    f = CACHE / f"cum_srs_{season}.csv"
-    col = "cum_srs"
+    """Load latest power ratings for the given season.
+    Prefers blended_srs (prior + actual) over raw cum_srs when available."""
+    f = CACHE / f"blended_srs_{season}.csv"
+    col = "blended_srs"
     if not f.exists():
-        f = CACHE / f"blended_srs_{season}.csv"
-        col = "blended_srs"
+        f = CACHE / f"cum_srs_{season}.csv"
+        col = "cum_srs"
     if not f.exists():
         return {}
     latest: dict[str, tuple[str, float]] = {}
@@ -269,7 +355,7 @@ def fetch_pitcher_stats(pitcher_id: int, season: int) -> dict:
 def fetch_schedule(game_date: str) -> list[dict]:
     data = _get(f"{MLB_API}/schedule", params={
         "sportId": 1, "date": game_date,
-        "hydrate": "probablePitcher,team", "gameType": "R",
+        "hydrate": "probablePitcher,team,venue", "gameType": "R",
     })
     games = []
     for db in data.get("dates", []):
@@ -284,14 +370,16 @@ def fetch_schedule(game_date: str) -> list[dict]:
             hp = g["teams"]["home"].get("probablePitcher") or {}
             ap = g["teams"]["away"].get("probablePitcher") or {}
             games.append({
-                "game_pk":          g["gamePk"],
-                "home":             home,
-                "away":             away,
-                "home_pitcher_id":  hp.get("id"),
+                "game_pk":           g["gamePk"],
+                "home":              home,
+                "away":              away,
+                "home_pitcher_id":   hp.get("id"),
                 "home_pitcher_name": hp.get("fullName", "TBD"),
-                "away_pitcher_id":  ap.get("id"),
+                "away_pitcher_id":   ap.get("id"),
                 "away_pitcher_name": ap.get("fullName", "TBD"),
-                "game_time":        g.get("gameDate", ""),
+                "game_time":         g.get("gameDate", ""),
+                "venue":             g.get("venue", {}).get("name", ""),
+                "date":              game_date,
             })
     return games
 
@@ -404,55 +492,72 @@ def main():
 
     # Load static data
     print("Loading model and static data…")
-    exp   = load_experiment()
-    mp    = load_model_params()
-    pf    = load_park_factors()
-    srs   = load_srs(args.season)
+    exp        = load_experiment()
+    mp         = load_model_params()
+    pf         = load_park_factors()
+    srs        = load_srs(args.season)
     games_2026 = load_games_2026()
+    stadiums   = load_stadiums()
     print(f"  Power ratings loaded for {len(srs)} teams ({args.season} regular season)")
+
+    # Pre-fetch all schedules so we can batch weather + pitcher lookups
+    print("\nFetching schedules…")
+    schedules: dict[str, list[dict]] = {}
+    all_games: list[dict] = []
+    for day_offset in range(args.days):
+        game_date = (date.fromisoformat(args.date) + timedelta(days=day_offset)).isoformat()
+        day_games = fetch_schedule(game_date)
+        schedules[game_date] = day_games
+        all_games.extend(day_games)
+        print(f"  {game_date}: {len(day_games)} game(s)")
+
+    # Fetch all pitcher stats up-front (one API call per unique pitcher)
+    print("\nFetching pitcher stats…")
+    pitcher_cache: dict[int, dict] = {}
+    all_ids = ({g["home_pitcher_id"] for g in all_games} |
+               {g["away_pitcher_id"] for g in all_games}) - {None}
+    for pid in all_ids:
+        pitcher_cache[pid] = fetch_pitcher_stats(pid, args.season)
+
+    # Batch weather for all outdoor games (one Open-Meteo call per unique venue)
+    print("\nFetching forecast weather for outdoor venues…")
+    wx_map = fetch_forecast_weather(all_games, stadiums)
+    outdoor_fetched = sum(1 for v in wx_map.values() if v["is_outdoor"] and v["temp_f"] != 72.0)
+    print(f"  {outdoor_fetched} outdoor game(s) with live forecast")
 
     # Fetch all market odds once (covers all upcoming games)
     print("\nFetching market odds (h2h + spreads + totals)…")
     odds_map = fetch_all_odds(api_key)
-    print(f"  {len(odds_map)} games with market odds\n")
+    print(f"  {len(odds_map)} games with market odds")
 
-    # Pitcher cache
-    pitcher_cache: dict[int, dict] = {}
+    bp_era = load_cached_bp_era(args.season)
 
     for day_offset in range(args.days):
         game_date = (date.fromisoformat(args.date) + timedelta(days=day_offset)).isoformat()
+        games     = schedules[game_date]
 
-        print(f"\n{'═'*90}")
+        print(f"\n{'═'*142}")
         print(f"  {game_date}")
-        print(f"{'═'*90}")
+        print(f"{'═'*142}")
 
-        # Per-date features
-        roll10   = build_roll10_diff(games_2026, game_date)
-        rest_map = build_rest_map(games_2026, game_date)
-        bp_era   = load_cached_bp_era(args.season)
-
-        print(f"Fetching schedule for {game_date}…")
-        games = fetch_schedule(game_date)
         if not games:
             print("  No games scheduled.")
             continue
-        print(f"  {len(games)} game(s)\n")
 
-        # Fetch pitcher stats (cached across days)
-        new_ids = {g["home_pitcher_id"] for g in games} | {g["away_pitcher_id"] for g in games}
-        new_ids -= {None} | set(pitcher_cache.keys())
-        for pid in new_ids:
-            pitcher_cache[pid] = fetch_pitcher_stats(pid, args.season)
+        roll10   = build_roll10_diff(games_2026, game_date)
+        rest_map = build_rest_map(games_2026, game_date)
 
         # Header
         print(f"{'Matchup':<13} {'Away SP / FIP':<22} {'Home SP / FIP':<22} "
-              f"{'── Run Diff ──':^14} {'── Moneyline ──':^17} {'── Run Line ──':^17} {'── Over/Under ──':^18}")
+              f"{'── Run Diff ──':^14} {'── Moneyline ──':^17} {'── Run Line ──':^17} "
+              f"{'── Over/Under ──':^18} {'── Weather ──':^13}")
         print(f"{'':13} {'':22} {'':22} "
               f"{'Pred':>5} {'σ':>4}  "
               f"{'Mdl-H':>6} {'Mkt-H':>6} {'Mkt-A':>6}  "
               f"{'MdlH':>5} {'MktH':>6} {'MktA':>6}  "
-              f"{'Pred':>5} {'Mkt':>5} {'Edge':>5}")
-        print("─" * 130)
+              f"{'Pred':>5} {'Mkt':>5} {'Edge':>5}  "
+              f"{'Temp':>4} {'Wind':>6}")
+        print("─" * 142)
 
         for g in games:
             home, away = g["home"], g["away"]
@@ -465,8 +570,13 @@ def main():
                       cum_era=REPLACEMENT_ERA, l3_era=REPLACEMENT_ERA, name="TBD"))
 
             mkt = odds_map.get((home, away), {})
+            wx  = wx_map.get(g["game_pk"],
+                  {"temp_f": 72.0, "tailwind_mph": 0.0,
+                   "is_outdoor": 0 if home in DOME_PARKS else 1})
 
-            # Totals prediction
+            sigma = game_sigma(hp["cum_fip"], ap["cum_fip"])
+
+            # Totals prediction with live weather injected
             row = {
                 "home_sp_fip": hp["cum_fip"], "away_sp_fip": ap["cum_fip"],
                 "home_l3_fip": hp["l3_fip"],  "away_l3_fip": ap["l3_fip"],
@@ -475,8 +585,9 @@ def main():
                 "home_bp_era": bp_era.get(home, REPLACEMENT_BP),
                 "away_bp_era": bp_era.get(away, REPLACEMENT_BP),
                 "park_factor": pf.get(home, 1.0),
-                "is_outdoor":  0 if home in DOME_PARKS else 1,
-                "temp_f": 72.0, "tailwind_mph": 0.0,
+                "is_outdoor":  wx["is_outdoor"],
+                "temp_f":      wx["temp_f"],
+                "tailwind_mph": wx["tailwind_mph"],
                 "home_roll10": "",  "away_roll10": "",
                 "home_ops": "",    "away_ops": "",
                 "home_srs": 0.0,   "away_srs": 0.0,
@@ -486,15 +597,12 @@ def main():
             }
             pred_total = exp.predict(row)
 
-            # Run differential prediction
             mu_diff = predict_run_diff(home, away, srs, rest_map, roll10, pf, mp,
                                        home_fip=hp["cum_fip"], away_fip=ap["cum_fip"])
 
-            # Probabilities
-            p_home_ml, p_away_ml   = run_diff_to_ml(mu_diff)
-            p_home_rl, p_away_rl   = run_diff_to_rl(mu_diff)
+            p_home_ml, p_away_ml = run_diff_to_ml(mu_diff, sigma)
+            p_home_rl, p_away_rl = run_diff_to_rl(mu_diff, sigma)
 
-            # Market odds
             mkt_ml_home = mkt.get("ml_home")
             mkt_ml_away = mkt.get("ml_away")
             mkt_rl_home = mkt.get("rl_price_home")
@@ -503,18 +611,27 @@ def main():
 
             ou_edge = f"{pred_total - mkt_ou:+.1f}" if mkt_ou else "  N/A"
 
+            if wx["is_outdoor"]:
+                wx_temp = f"{wx['temp_f']:.0f}°F"
+                wx_wind = f"{wx['tailwind_mph']:+.1f}↑"
+            else:
+                wx_temp = "dome"
+                wx_wind = ""
+
             matchup = f"{away}@{home}"
             away_sp = f"{g['away_pitcher_name'][:14]} {ap['cum_fip']:.2f}"
             home_sp = f"{g['home_pitcher_name'][:14]} {hp['cum_fip']:.2f}"
 
             print(f"{matchup:<13} {away_sp:<22} {home_sp:<22} "
-                  f"{mu_diff:>+5.1f} {SIGMA:>4.1f}  "
+                  f"{mu_diff:>+5.1f} {sigma:>4.2f}  "
                   f"{prob_to_american(p_home_ml):>6} {fmt_american(mkt_ml_home):>6} {fmt_american(mkt_ml_away):>6}  "
                   f"{prob_to_american(p_home_rl):>5} {fmt_american(mkt_rl_home):>6} {fmt_american(mkt_rl_away):>6}  "
-                  f"{pred_total:>5.1f} {mkt_ou or ' N/A':>5} {ou_edge:>5}")
+                  f"{pred_total:>5.1f} {mkt_ou or ' N/A':>5} {ou_edge:>5}  "
+                  f"{wx_temp:>4} {wx_wind:>6}")
 
-        print(f"\nNOTE: Run diff σ=4.6 (empirical 2025). ML/RL model uses {args.season} regular-season power ratings.")
+        print(f"\nNOTE: σ is per-game (FIP-adjusted). ML/RL model uses {args.season} regular-season power ratings.")
         print("      TBD pitcher = replacement FIP 4.40. Edge = model O/U minus market O/U.")
+        print("      Weather wind = tailwind toward CF (+=helps offense). Temp/wind weights currently 0 in totals model.")
 
 
 if __name__ == "__main__":
