@@ -2,8 +2,8 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 117: era_fip_div_w = 0.27 (was 0.26).
-# Hypothesis: 0.26 was neutral; push to 0.27 to find ceiling in park2 context.
+# Experiment 116: bp_weight restored to 0.33 and era_fip_div_w = 0.26 (was 0.25).
+# Hypothesis: bp_weight=0.33 is optimum; era_fip_div_w=0.26 reverted pre-park2 but direction untested in new context.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -22,7 +22,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.19  # bullpen 3-day IP fatigue — EXP 105: try -0.19 (was -0.18)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.27   # ERA-FIP last-3 divergence — EXP 117: try 0.27 (was 0.26)
+era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 116: try 0.26 (was 0.25) in new park2 context
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 park2_weight   = 10.0   # EXP 100: park factor quadratic term — try 10.0 (was 8.0)
 intercept      = 0.00
