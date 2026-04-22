@@ -2,9 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 29: BP ERA cap sensitivity — try BP_ERA_CAP = 5.75 (was 6.0).
-# Hypothesis: tighter bullpen ERA cap reduces noise from outlier bad bullpens,
-# especially early-season small sample flukes above 5.75 ERA.
+# Experiment 30: Ace asymmetry ratio — try 1.5×ace / 0.5×weaker (was 1.4×/0.6×).
+# Hypothesis: stronger ace weighting may compress totals more effectively when
+# one pitcher clearly dominates. The gap_weight captures gap size; this captures directionality.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -47,7 +47,7 @@ def predict(row: dict) -> float:
 
     sp_better = min(home_sp, away_sp)   # lower FIP = ace
     sp_worse  = max(home_sp, away_sp)   # higher FIP = weaker starter
-    sp_runs   = (0.6 * sp_worse + 1.4 * sp_better)                          * sp_weight
+    sp_runs   = (0.5 * sp_worse + 1.5 * sp_better)                          * sp_weight  # EXP 30: 1.5×ace
     bp_runs  = (min(f("home_bp_era"), BP_ERA_CAP) + min(f("away_bp_era"), BP_ERA_CAP)) * bp_weight
     park_adj = (f("park_factor") - 1.0)                                      * park_weight
     temp_adj = ((f("temp_f") - 72.0) * temp_weight) if outdoor else 0.0
