@@ -2,8 +2,9 @@
 # THIS IS THE ONLY FILE YOU SHOULD MODIFY.
 # Run:  python run_experiment.py
 #
-# Experiment 74: fatigue_weight to -0.14 (was -0.13 after EXP 73 kept).
-# Hypothesis: -0.13 improved both splits; test if -0.14 continues improving.
+# Experiment 79: era_fip_div_w = 0.26 (was 0.25).
+# Hypothesis: small upward step in ERA-FIP last-3 divergence weight; 0.25 is current floor,
+# 0.30 reverted — check if 0.26 finds headroom between.
 
 REPLACEMENT_FIP = 4.40
 REPLACEMENT_ERA = 4.50
@@ -22,7 +23,7 @@ srs_weight     = 0.00   # ablated experiment 2
 ops_weight     = 0.00   # ablated experiment 1
 fatigue_weight = -0.14  # bullpen 3-day IP fatigue — EXP 74: try -0.14 (was -0.13)
 fatigue_center = 11.62  # training-mean combined 3-day BP IP
-era_fip_div_w  = 0.25   # ERA-FIP last-3 divergence — EXPERIMENT 21: try 0.25 (was 0.20)
+era_fip_div_w  = 0.26   # ERA-FIP last-3 divergence — EXP 79: try 0.26 (was 0.25)
 gap_weight     = -0.35  # abs SP FIP gap — EXP 57: try -0.35 (was -0.30)
 intercept      = 0.00
 model_blend    = 0.35   # EXP 62: try 0.35 (was 0.37)
